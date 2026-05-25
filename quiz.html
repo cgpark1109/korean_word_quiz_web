@@ -323,26 +323,18 @@
       function renderMCQ(q) {
         document.getElementById('choicesGrid').style.display = '';
 
-        if (level === 'intermediate') {
-          // Intermediate: always Korean → English (adjectives/emotions)
+        // Beginner & Intermediate: random Type A / Type B per question
+        const typeA = Math.random() > 0.5;
+        if (typeA) {
           document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
           document.getElementById('questionWord').textContent = q.korean;
           document.getElementById('questionWord').className = 'question-word';
           buildChoices(q, 'english', pool);
         } else {
-          // Beginner: random Type A / Type B
-          const typeA = Math.random() > 0.5;
-          if (typeA) {
-            document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
-            document.getElementById('questionWord').textContent = q.korean;
-            document.getElementById('questionWord').className = 'question-word';
-            buildChoices(q, 'english', pool);
-          } else {
-            document.getElementById('questionTypeLabel').textContent = 'What is the Korean word?';
-            document.getElementById('questionWord').textContent = q.english;
-            document.getElementById('questionWord').className = 'question-word';
-            buildChoices(q, 'korean', pool);
-          }
+          document.getElementById('questionTypeLabel').textContent = 'What is the Korean word?';
+          document.getElementById('questionWord').textContent = q.english;
+          document.getElementById('questionWord').className = 'question-word';
+          buildChoices(q, 'korean', pool);
         }
       }
 
