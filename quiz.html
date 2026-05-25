@@ -303,8 +303,9 @@
       let streak = 0;
 
       // 방향 선택 (입문·중급 전용): 'KO_EN' | 'EN_KO'
-      // localStorage에서 이전 설정 복원, 없으면 기본값 'KO_EN'
-      let quizDir = localStorage.getItem('quizDir') || 'KO_EN';
+      // 레벨별로 별도 키를 사용해 독립적으로 저장·복원
+      const dirKey = `quizDir_${level}`;
+      let quizDir = localStorage.getItem(dirKey) || 'KO_EN';
 
       if (level === 'beginner' || level === 'intermediate') {
         const wrap = document.getElementById('dirToggleWrap');
@@ -321,7 +322,7 @@
 
         function setDir(dir) {
           quizDir = dir;
-          localStorage.setItem('quizDir', dir);
+          localStorage.setItem(dirKey, dir);
           applyDirUI();
           // 현재 문제를 새 방향으로 즉시 재렌더링
           renderQuestion();
