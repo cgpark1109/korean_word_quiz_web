@@ -303,17 +303,28 @@
       let streak = 0;
 
       // 방향 선택 (입문·중급 전용): 'KO_EN' | 'EN_KO'
-      let quizDir = 'KO_EN';
+      // localStorage에서 이전 설정 복원, 없으면 기본값 'KO_EN'
+      let quizDir = localStorage.getItem('quizDir') || 'KO_EN';
+
       if (level === 'beginner' || level === 'intermediate') {
         const wrap = document.getElementById('dirToggleWrap');
         const btnKO = document.getElementById('dirBtnKO');
         const btnEN = document.getElementById('dirBtnEN');
         wrap.style.display = '';
 
+        function applyDirUI() {
+          btnKO.classList.toggle('active', quizDir === 'KO_EN');
+          btnEN.classList.toggle('active', quizDir === 'EN_KO');
+        }
+        // 복원된 설정을 버튼 UI에 즉시 반영
+        applyDirUI();
+
         function setDir(dir) {
           quizDir = dir;
-          btnKO.classList.toggle('active', dir === 'KO_EN');
-          btnEN.classList.toggle('active', dir === 'EN_KO');
+          localStorage.setItem('quizDir', dir);
+          applyDirUI();
+          // 현재 문제를 새 방향으로 즉시 재렌더링
+          renderQuestion();
         }
         btnKO.addEventListener('click', () => setDir('KO_EN'));
         btnEN.addEventListener('click', () => setDir('EN_KO'));
