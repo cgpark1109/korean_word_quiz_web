@@ -167,6 +167,32 @@
       border-radius: 4px;
       padding: 2px 8px;
     }
+
+    /* 방향 선택 토글 (입문·중급 전용) */
+    .dir-toggle-wrap {
+      display: flex;
+      gap: 8px;
+      padding: 0 20px 14px;
+    }
+    .dir-btn {
+      flex: 1;
+      padding: 9px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s, color 0.18s;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .dir-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+    }
   </style>
   <script src="./js/app.js?v=20260525-3"></script>
 </head>
@@ -181,6 +207,12 @@
     <div class="progress-bar-bg">
       <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
     </div>
+  </div>
+
+  <!-- 방향 선택 토글: 입문·중급 전용, JS가 필요 시 노출 -->
+  <div class="dir-toggle-wrap" id="dirToggleWrap" style="display:none;">
+    <button class="dir-btn active" id="dirBtnKO">한글 → 영어</button>
+    <button class="dir-btn" id="dirBtnEN">영어 → 한글</button>
   </div>
 
   <div class="card question-card">
@@ -270,6 +302,23 @@
       let correctCount = 0;
       let streak = 0;
 
+      // 방향 선택 (입문·중급 전용): 'KO_EN' | 'EN_KO'
+      let quizDir = 'KO_EN';
+      if (level === 'beginner' || level === 'intermediate') {
+        const wrap = document.getElementById('dirToggleWrap');
+        const btnKO = document.getElementById('dirBtnKO');
+        const btnEN = document.getElementById('dirBtnEN');
+        wrap.style.display = '';
+
+        function setDir(dir) {
+          quizDir = dir;
+          btnKO.classList.toggle('active', dir === 'KO_EN');
+          btnEN.classList.toggle('active', dir === 'EN_KO');
+        }
+        btnKO.addEventListener('click', () => setDir('KO_EN'));
+        btnEN.addEventListener('click', () => setDir('EN_KO'));
+      }
+
       function shuffle(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -323,9 +372,7 @@
       function renderMCQ(q) {
         document.getElementById('choicesGrid').style.display = '';
 
-        // Beginner & Intermediate: random Type A / Type B per question
-        const typeA = Math.random() > 0.5;
-        if (typeA) {
+        if (quizDir === 'KO_EN') {
           document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
           document.getElementById('questionWord').textContent = q.korean;
           document.getElementById('questionWord').className = 'question-word';
