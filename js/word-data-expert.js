@@ -1,34 +1,152 @@
+// Quiz type: Korean homophone + one meaning's emoji & example displayed
+//   → choose the correct English meaning (4-choice)
+// After answering, ALL meanings for that word are revealed.
 const WordData = {
   expert: [
-    { korean: '눈 (目)', english: 'Eye', synonym: '시선, 눈길', usage: '눈이 크다 (big eyes)' },
-    { korean: '눈 (雪)', english: 'Snow', synonym: '설', usage: '눈이 오다 (it snows)' },
-    { korean: '배 (腹)', english: 'Stomach/Belly', synonym: '복부', usage: '배가 고프다 (hungry)' },
-    { korean: '배 (船)', english: 'Ship/Boat', synonym: '선박', usage: '배를 타다 (ride a boat)' },
-    { korean: '배 (梨)', english: 'Pear', synonym: '배나무 열매', usage: '배를 먹다 (eat a pear)' },
-    { korean: '말 (言)', english: 'Word/Speech', synonym: '언어, 언급', usage: '말을 하다 (to speak)' },
-    { korean: '말 (馬)', english: 'Horse', synonym: '마필', usage: '말을 타다 (ride a horse)' },
-    { korean: '차 (車)', english: 'Car', synonym: '자동차', usage: '차를 운전하다 (drive a car)' },
-    { korean: '차 (茶)', english: 'Tea', synonym: '음료', usage: '차를 마시다 (drink tea)' },
-    { korean: '밝다', english: 'Bright', synonym: '환하다, 명랑하다', usage: '방이 밝다 (bright room)' },
-    { korean: '작다', english: 'Small', synonym: '소형, 미소', usage: '크기가 작다 (small size)' },
-    { korean: '크다', english: 'Big/Large', synonym: '대형, 거대하다', usage: '집이 크다 (big house)' },
-    { korean: '빠르다', english: 'Fast', synonym: '신속하다, 재빠르다', usage: '달리기가 빠르다 (fast runner)' },
-    { korean: '느리다', english: 'Slow', synonym: '완만하다, 더디다', usage: '걸음이 느리다 (slow walker)' },
-    { korean: '예쁘다', english: 'Pretty', synonym: '아름답다, 귀엽다', usage: '꽃이 예쁘다 (pretty flower)' },
-    { korean: '기쁘다', english: 'Happy/Joyful', synonym: '즐겁다, 행복하다', usage: '마음이 기쁘다 (joyful heart)' },
-    { korean: '슬프다', english: 'Sad', synonym: '우울하다, 서글프다', usage: '마음이 슬프다 (sad heart)' },
-    { korean: '무섭다', english: 'Scary', synonym: '두렵다, 공포스럽다', usage: '귀신이 무섭다 (scary ghost)' },
-    { korean: '힘들다', english: 'Hard/Difficult', synonym: '어렵다, 고되다', usage: '일이 힘들다 (hard work)' },
-    { korean: '쉽다', english: 'Easy', synonym: '간단하다, 수월하다', usage: '문제가 쉽다 (easy problem)' },
-    { korean: '높다', english: 'High/Tall', synonym: '거대하다, 우뚝하다', usage: '산이 높다 (tall mountain)' },
-    { korean: '낮다', english: 'Low', synonym: '평평하다', usage: '천장이 낮다 (low ceiling)' },
-    { korean: '많다', english: 'Many/Much', synonym: '풍부하다, 다양하다', usage: '사람이 많다 (many people)' },
-    { korean: '적다', english: 'Few/Little', synonym: '부족하다, 드물다', usage: '시간이 적다 (little time)' },
-    { korean: '좋다', english: 'Good', synonym: '훌륭하다, 멋있다', usage: '날씨가 좋다 (good weather)' },
-    { korean: '나쁘다', english: 'Bad', synonym: '안 좋다, 불량하다', usage: '날씨가 나쁘다 (bad weather)' },
-    { korean: '덥다', english: 'Hot', synonym: '뜨겁다, 후덥지근하다', usage: '날씨가 덥다 (hot weather)' },
-    { korean: '춥다', english: 'Cold', synonym: '차갑다, 싸늘하다', usage: '날씨가 춥다 (cold weather)' },
-    { korean: '맛있다', english: 'Delicious', synonym: '맛나다, 훌륭하다', usage: '음식이 맛있다 (delicious food)' },
-    { korean: '맛없다', english: 'Tasteless', synonym: '밍밍하다', usage: '음식이 맛없다 (bad food)' },
+    {
+      korean: '눈',
+      meanings: [
+        { english: 'Eye', emoji: '👁️', example: '눈이 크다 (Big eyes)' },
+        { english: 'Snow', emoji: '❄️', example: '눈이 내리다 (Snow is falling)' },
+      ],
+    },
+    {
+      korean: '배',
+      meanings: [
+        { english: 'Belly / Stomach', emoji: '🫃', example: '배가 고프다 (I am hungry)' },
+        { english: 'Ship / Boat', emoji: '🚢', example: '배를 타다 (Ride a ship)' },
+        { english: 'Pear (fruit)', emoji: '🍐', example: '배를 먹다 (Eat a pear)' },
+      ],
+    },
+    {
+      korean: '말',
+      meanings: [
+        { english: 'Word / Speech', emoji: '💬', example: '말을 하다 (To speak)' },
+        { english: 'Horse', emoji: '🐴', example: '말을 타다 (Ride a horse)' },
+      ],
+    },
+    {
+      korean: '차',
+      meanings: [
+        { english: 'Car / Vehicle', emoji: '🚗', example: '차를 운전하다 (Drive a car)' },
+        { english: 'Tea', emoji: '☕', example: '차를 마시다 (Drink tea)' },
+      ],
+    },
+    {
+      korean: '밤',
+      meanings: [
+        { english: 'Night', emoji: '🌙', example: '밤이 깊다 (The night is deep)' },
+        { english: 'Chestnut', emoji: '🌰', example: '밤을 먹다 (Eat chestnuts)' },
+      ],
+    },
+    {
+      korean: '발',
+      meanings: [
+        { english: 'Foot', emoji: '🦶', example: '발이 크다 (Big feet)' },
+        { english: 'Bamboo blind / Curtain', emoji: '🎋', example: '발을 치다 (Put up a blind)' },
+      ],
+    },
+    {
+      korean: '손',
+      meanings: [
+        { english: 'Hand', emoji: '✋', example: '손을 씻다 (Wash hands)' },
+        { english: 'Guest', emoji: '🧑‍🤝‍🧑', example: '손이 오셨다 (A guest has arrived)' },
+      ],
+    },
+    {
+      korean: '귀',
+      meanings: [
+        { english: 'Ear', emoji: '👂', example: '귀가 밝다 (Good hearing)' },
+        { english: 'Noble / Precious', emoji: '💎', example: '귀한 손님 (A precious guest)' },
+      ],
+    },
+    {
+      korean: '사과',
+      meanings: [
+        { english: 'Apple', emoji: '🍎', example: '사과를 먹다 (Eat an apple)' },
+        { english: 'Apology', emoji: '🙏', example: '사과를 하다 (Make an apology)' },
+      ],
+    },
+    {
+      korean: '다리',
+      meanings: [
+        { english: 'Leg', emoji: '🦵', example: '다리가 길다 (Long legs)' },
+        { english: 'Bridge', emoji: '🌉', example: '다리를 건너다 (Cross a bridge)' },
+      ],
+    },
+    {
+      korean: '모자',
+      meanings: [
+        { english: 'Hat / Cap', emoji: '🎩', example: '모자를 쓰다 (Wear a hat)' },
+        { english: 'Mother and Child', emoji: '👩‍👦', example: '모자가 함께 산책하다 (Mother and child walk together)' },
+      ],
+    },
+    {
+      korean: '별',
+      meanings: [
+        { english: 'Star', emoji: '⭐', example: '별이 빛나다 (Stars are shining)' },
+        { english: 'Special / Extraordinary', emoji: '✨', example: '별일 없다 (Nothing special / Nothing unusual)' },
+      ],
+    },
+    {
+      korean: '비',
+      meanings: [
+        { english: 'Rain', emoji: '🌧️', example: '비가 오다 (It is raining)' },
+        { english: 'Broom', emoji: '🧹', example: '비로 쓸다 (Sweep with a broom)' },
+      ],
+    },
+    {
+      korean: '가지',
+      meanings: [
+        { english: 'Eggplant / Aubergine', emoji: '🍆', example: '가지를 볶다 (Stir-fry eggplant)' },
+        { english: 'Branch / Twig', emoji: '🌿', example: '나뭇가지를 꺾다 (Break off a branch)' },
+      ],
+    },
+    {
+      korean: '공',
+      meanings: [
+        { english: 'Ball', emoji: '⚽', example: '공을 차다 (Kick a ball)' },
+        { english: 'Merit / Achievement', emoji: '🏆', example: '공을 세우다 (Achieve merit)' },
+        { english: 'Empty / Zero', emoji: '0️⃣', example: '공백 (Empty space / Blank)' },
+      ],
+    },
+    {
+      korean: '기사',
+      meanings: [
+        { english: 'News Article', emoji: '📰', example: '기사를 읽다 (Read a news article)' },
+        { english: 'Driver / Chauffeur', emoji: '🚖', example: '택시 기사 (Taxi driver)' },
+        { english: 'Knight', emoji: '⚔️', example: '기사도 정신 (Spirit of chivalry)' },
+      ],
+    },
+    {
+      korean: '인사',
+      meanings: [
+        { english: 'Greeting', emoji: '👋', example: '인사를 하다 (To greet someone)' },
+        { english: 'Personnel / HR', emoji: '📋', example: '인사 부서 (HR department)' },
+      ],
+    },
+    {
+      korean: '시장',
+      meanings: [
+        { english: 'Market', emoji: '🛒', example: '시장에 가다 (Go to the market)' },
+        { english: 'Mayor', emoji: '🏛️', example: '서울 시장 (Mayor of Seoul)' },
+      ],
+    },
+    {
+      korean: '바람',
+      meanings: [
+        { english: 'Wind', emoji: '💨', example: '바람이 불다 (The wind blows)' },
+        { english: 'Wish / Desire', emoji: '🌟', example: '내 바람이다 (It is my wish)' },
+        { english: 'Affair / Cheating', emoji: '💔', example: '바람을 피우다 (Have an affair)' },
+      ],
+    },
+    {
+      korean: '감',
+      meanings: [
+        { english: 'Persimmon (fruit)', emoji: '🟠', example: '감이 달다 (The persimmon is sweet)' },
+        { english: 'Intuition / Gut feeling', emoji: '💭', example: '감이 좋다 (Good intuition)' },
+        { english: 'Material / Cloth', emoji: '🧵', example: '옷감 (Clothing material)' },
+      ],
+    },
   ],
 };

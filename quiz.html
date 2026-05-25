@@ -323,17 +323,26 @@
       function renderMCQ(q) {
         document.getElementById('choicesGrid').style.display = '';
 
-        const typeA = Math.random() < 0.5;
-        if (typeA) {
+        if (level === 'intermediate') {
+          // Intermediate: always Korean → English (adjectives/emotions)
           document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
           document.getElementById('questionWord').textContent = q.korean;
           document.getElementById('questionWord').className = 'question-word';
           buildChoices(q, 'english', pool);
         } else {
-          document.getElementById('questionTypeLabel').textContent = 'What is the Korean word?';
-          document.getElementById('questionWord').textContent = q.english;
-          document.getElementById('questionWord').className = 'question-word';
-          buildChoices(q, 'korean', pool);
+          // Beginner: random Type A / Type B
+          const typeA = Math.random() > 0.5;
+          if (typeA) {
+            document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
+            document.getElementById('questionWord').textContent = q.korean;
+            document.getElementById('questionWord').className = 'question-word';
+            buildChoices(q, 'english', pool);
+          } else {
+            document.getElementById('questionTypeLabel').textContent = 'What is the Korean word?';
+            document.getElementById('questionWord').textContent = q.english;
+            document.getElementById('questionWord').className = 'question-word';
+            buildChoices(q, 'korean', pool);
+          }
         }
       }
 
@@ -344,6 +353,9 @@
         ).slice(0, 3);
         const options = shuffle([correct, ...others]);
 
+        const feedbackText = q.example || q.hint || '';
+        const feedbackLabel = q.example ? 'Example' : (q.hint ? 'Hint' : '');
+
         const grid = document.getElementById('choicesGrid');
         grid.innerHTML = '';
         options.forEach(opt => {
@@ -351,13 +363,13 @@
           btn.className = 'choice-btn';
           btn.textContent = opt;
           btn.addEventListener('click', () => {
-            handleMCQChoice(btn, opt, correct, q.hint || '');
+            handleMCQChoice(btn, opt, correct, feedbackText, feedbackLabel);
           });
           grid.appendChild(btn);
         });
       }
 
-      function handleMCQChoice(btn, selected, correct, hint) {
+      function handleMCQChoice(btn, selected, correct, feedbackText, feedbackLabel) {
         document.querySelectorAll('.choice-btn').forEach(b => {
           b.disabled = true;
           if (b.textContent === correct) b.classList.add('correct');
@@ -373,13 +385,13 @@
           applyStreak();
           fb.className = 'feedback-box correct show';
           title.textContent = '✓ Correct!';
-          hintEl.textContent = hint ? `Hint: ${hint}` : '';
+          hintEl.textContent = feedbackText ? `${feedbackLabel}: ${feedbackText}` : '';
         } else {
           btn.classList.add('wrong');
           streak = 0;
           fb.className = 'feedback-box wrong show';
           title.textContent = '✗ Wrong!';
-          hintEl.textContent = `Correct: ${correct}${hint ? ' · Hint: ' + hint : ''}`;
+          hintEl.textContent = `Correct: ${correct}${feedbackText ? ' · ' + feedbackLabel + ': ' + feedbackText : ''}`;
         }
         showNextBtn();
       }
@@ -437,14 +449,23 @@
 
       function renderExpert(q) {
         document.getElementById('choicesGrid').style.display = '';
-        document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
+        document.getElementById('questionTypeLabel').textContent = 'What does this mean?';
         document.getElementById('questionWord').textContent = q.korean;
         document.getElementById('questionWord').className = 'question-word';
 
+        // Pick one random meaning to quiz on
+        const targetIdx = Math.floor(Math.random() * q.meanings.length);
+        const target = q.meanings[targetIdx];
+
+        document.getElementById('questionSubHint').innerHTML =
+          `${target.emoji}&nbsp;&nbsp;<em>${target.example}</em>`;
+
+        // Collect wrong options from all other meanings in the pool
+        const allEnglish = pool.flatMap(w => w.meanings.map(m => m.english));
         const others = shuffle(
-          pool.filter(w => w.english !== q.english).map(w => w.english)
+          allEnglish.filter(e => e !== target.english)
         ).slice(0, 3);
-        const options = shuffle([q.english, ...others]);
+        const options = shuffle([target.english, ...others]);
 
         const grid = document.getElementById('choicesGrid');
         grid.innerHTML = '';
@@ -452,34 +473,41 @@
           const btn = document.createElement('button');
           btn.className = 'choice-btn';
           btn.textContent = opt;
-          btn.addEventListener('click', () => handleExpertChoice(btn, opt, q));
+          btn.addEventListener('click', () => handleExpertChoice(btn, opt, q, target));
           grid.appendChild(btn);
         });
       }
 
-      function handleExpertChoice(btn, selected, q) {
+      function handleExpertChoice(btn, selected, q, target) {
         document.querySelectorAll('.choice-btn').forEach(b => {
           b.disabled = true;
-          if (b.textContent === q.english) b.classList.add('correct');
+          if (b.textContent === target.english) b.classList.add('correct');
         });
 
         const fb = document.getElementById('feedbackBox');
         const title = document.getElementById('feedbackTitle');
         const hintEl = document.getElementById('feedbackHint');
 
-        if (selected === q.english) {
+        const allMeaningsHtml = q.meanings
+          .map(m => `${m.emoji} <strong>${m.english}</strong> — <em>${m.example}</em>`)
+          .join('<br>');
+
+        if (selected === target.english) {
           btn.classList.add('correct');
           streak++;
           applyStreak();
           fb.className = 'feedback-box correct show';
           title.textContent = '✓ Correct!';
-          hintEl.innerHTML = `동의어: <strong>${q.synonym}</strong><br>예문: <em>${q.usage}</em>`;
+          hintEl.innerHTML =
+            `All meanings of <strong>'${q.korean}'</strong>:<br>${allMeaningsHtml}`;
         } else {
           btn.classList.add('wrong');
           streak = 0;
           fb.className = 'feedback-box wrong show';
           title.textContent = '✗ Wrong!';
-          hintEl.innerHTML = `정답: <strong>${q.english}</strong><br>동의어: ${q.synonym}<br>예문: <em>${q.usage}</em>`;
+          hintEl.innerHTML =
+            `Correct: <strong>${target.english}</strong><br>` +
+            `All meanings of <strong>'${q.korean}'</strong>:<br>${allMeaningsHtml}`;
         }
         showNextBtn();
       }

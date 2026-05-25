@@ -1,3 +1,6 @@
+// Quiz type is randomised per question in quiz.html (renderMCQ):
+//   Type A (Math.random() > 0.5): Korean word displayed → choose English answer
+//   Type B: English word displayed → choose Korean answer
 const WordData = {
   beginner: [
     { korean: '사과', english: 'Apple' },
