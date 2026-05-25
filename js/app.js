@@ -48,6 +48,25 @@ async function loadNotice() {
   } catch (e) {}
 }
 
+async function notifyApp(eventName, payload = {}) {
+  if (
+    typeof window.flutter_inappwebview === 'undefined' ||
+    typeof window.flutter_inappwebview.callHandler !== 'function'
+  ) {
+    return false;
+  }
+
+  try {
+    await window.flutter_inappwebview.callHandler('KoreanWordQuizApp', {
+      event: eventName,
+      ...payload,
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function showPopup(n) {
   const el = document.createElement('div');
   el.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;

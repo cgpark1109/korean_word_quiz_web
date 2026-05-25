@@ -156,6 +156,16 @@
     const homeUrl = new URL('index.html', location.href);
     homeUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('homeLink').href = homeUrl.toString();
+
+    // In the app WebView, notify Flutter once per quiz completion
+    // so it can show an interstitial ad after the 10-question run.
+    window.setTimeout(() => {
+      notifyApp('quizCompleted', {
+        level,
+        score,
+        correct,
+      });
+    }, 250);
   </script>
 </body>
 </html>
