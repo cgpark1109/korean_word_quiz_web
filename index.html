@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Korean Word Quiz</title>
+  <link rel="stylesheet" href="./css/base.css?v=20260525-3">
+  <style>
+    .header {
+      padding: 40px 24px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-decoration {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .deco-word {
+      position: absolute;
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--text-primary);
+      opacity: 0.08;
+      white-space: nowrap;
+    }
+    .app-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      position: relative;
+      z-index: 1;
+    }
+    .app-subtitle {
+      font-size: 14px;
+      color: var(--gold);
+      margin-top: 6px;
+      position: relative;
+      z-index: 1;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0 20px 10px;
+    }
+    .level-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 20px;
+    }
+    .level-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 80px;
+      padding: 0 20px;
+      cursor: pointer;
+      border: none;
+      text-align: left;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .level-card:active {
+      transform: scale(0.98);
+    }
+    .level-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .level-info {
+      flex: 1;
+    }
+    .level-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .level-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .level-arrow {
+      font-size: 18px;
+      color: var(--border);
+    }
+    .footer-btn {
+      padding: 20px 20px 0;
+    }
+    .settings-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      width: 100%;
+    }
+  </style>
+  <script src="./js/app.js?v=20260525-3"></script>
+</head>
+<body>
+  <div class="header">
+    <div class="header-decoration">
+      <span class="deco-word" style="top:10px;left:-10px;">사과</span>
+      <span class="deco-word" style="top:0px;right:-5px;font-size:36px;">학교</span>
+      <span class="deco-word" style="bottom:0px;left:20px;font-size:40px;">친구</span>
+      <span class="deco-word" style="bottom:5px;right:10px;font-size:32px;">하늘</span>
+    </div>
+    <div class="app-title">Korean Word Quiz</div>
+    <div class="app-subtitle">한국어 단어 퀴즈</div>
+  </div>
+
+  <div class="section-label">Choose Level</div>
+
+  <div class="level-list">
+    <button class="level-card" type="button" data-level="beginner">
+      <span class="level-icon">🌱</span>
+      <div class="level-info">
+        <div class="level-name">입문 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Beginner</span></div>
+        <div class="level-sub">30 words · 일상 단어 4지선다</div>
+      </div>
+      <span class="level-arrow">›</span>
+    </button>
+
+    <button class="level-card" type="button" data-level="intermediate">
+      <span class="level-icon">🌿</span>
+      <div class="level-info">
+        <div class="level-name">중급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Intermediate</span></div>
+        <div class="level-sub">30 idioms · 사자성어 4지선다</div>
+      </div>
+      <span class="level-arrow">›</span>
+    </button>
+
+    <button class="level-card" type="button" data-level="advanced">
+      <span class="level-icon">🌳</span>
+      <div class="level-info">
+        <div class="level-name">고급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Advanced</span></div>
+        <div class="level-sub">30 proverbs · 속담 빈칸 채우기</div>
+      </div>
+      <span class="level-arrow">›</span>
+    </button>
+
+    <button class="level-card" type="button" data-level="expert">
+      <span class="level-icon">⭐</span>
+      <div class="level-info">
+        <div class="level-name">특급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Expert</span></div>
+        <div class="level-sub">30 words · 다의어·유의어</div>
+      </div>
+      <span class="level-arrow">›</span>
+    </button>
+
+    <button class="level-card" type="button" data-level="master">
+      <span class="level-icon">👑</span>
+      <div class="level-info">
+        <div class="level-name">초특급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Master</span></div>
+        <div class="level-sub">30 puzzles · 낱말퍼즐 직접 입력</div>
+      </div>
+      <span class="level-arrow">›</span>
+    </button>
+  </div>
+
+  <div class="footer-btn">
+    <a href="settings.html" class="btn-secondary settings-btn" style="text-decoration:none;">
+      ⚙️ Settings
+    </a>
+  </div>
+
+  <script>
+    const WEB_VERSION =
+      new URLSearchParams(window.location.search).get('v') || '20260525-3';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNotice();
+
+      const settingsLink = document.querySelector('.settings-btn');
+      if (settingsLink) {
+        const settingsUrl = new URL('settings.html', location.href);
+        settingsUrl.searchParams.set('v', WEB_VERSION);
+        settingsLink.href = settingsUrl.toString();
+      }
+
+      document.querySelectorAll('.level-card[data-level]').forEach(card => {
+        card.addEventListener('click', () => {
+          const level = card.dataset.level;
+          if (!level) return;
+          const nextUrl = new URL('quiz.html', location.href);
+          nextUrl.searchParams.set('level', level);
+          nextUrl.searchParams.set('v', WEB_VERSION);
+          location.href = nextUrl.toString();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

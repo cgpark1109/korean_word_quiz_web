@@ -1,0 +1,4 @@
+{
+  "popup": { "active": false, "title": "", "message": "", "button": "OK", "version": "1.0" },
+  "banner": { "active": false, "message": "" }
+}

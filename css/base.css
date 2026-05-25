@@ -1,0 +1,86 @@
+:root {
+  --bg: #F5F0E8;
+  --card-bg: #EDE5D5;
+  --border: #C9B99A;
+  --gold: #8B6914;
+  --green: #5C7A3E;
+  --red: #8B2020;
+  --text-primary: #3D2B1A;
+  --text-secondary: #6B4F2A;
+  --text-muted: #9B8B7A;
+  --correct-bg: #EAF0E0;
+  --correct-text: #5C7A3E;
+  --wrong-bg: #F5E0E0;
+  --wrong-text: #8B2020;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+a,
+button,
+.level-card {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: #FFF8E7;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 15px;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}

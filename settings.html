@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Settings – Korean Word Quiz</title>
+  <link rel="stylesheet" href="./css/base.css?v=20260525-3">
+  <style>
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px 8px;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 15px;
+      color: var(--gold);
+      cursor: pointer;
+      padding: 4px 0;
+      font-weight: 600;
+    }
+    .page-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .section {
+      padding: 20px 20px 0;
+    }
+    .section-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .info-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+    .info-value {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .link-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      cursor: pointer;
+    }
+    .link-row:active {
+      background: var(--bg);
+    }
+    .link-label {
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+    .link-arrow {
+      font-size: 16px;
+      color: var(--border);
+    }
+  </style>
+  <script src="./js/app.js?v=20260525-3"></script>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="back-btn" href="index.html">← Back</a>
+    <span class="page-title">Settings</span>
+  </div>
+
+  <div class="section">
+    <div class="section-header">About</div>
+    <div class="info-card">
+      <div class="info-row">
+        <span class="info-label">App Version</span>
+        <span class="info-value">1.0.0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Developer</span>
+        <span class="info-value">GGOOK's Studio</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:16px;">
+    <div class="section-header">Legal</div>
+    <div class="info-card">
+      <div class="link-row" onclick="openPrivacy()">
+        <span class="link-label">Privacy Policy</span>
+        <span class="link-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WEB_VERSION =
+      new URLSearchParams(window.location.search).get('v') || '20260525-3';
+
+    const backLink = document.querySelector('.back-btn');
+    if (backLink) {
+      const backUrl = new URL('index.html', location.href);
+      backUrl.searchParams.set('v', WEB_VERSION);
+      backLink.href = backUrl.toString();
+    }
+
+    function openPrivacy() {
+      const url = 'https://kysystemstudio.com/privacy.html';
+      window.location.href = url;
+    }
+  </script>
+</body>
+</html>
