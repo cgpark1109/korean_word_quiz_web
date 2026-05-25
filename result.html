@@ -124,7 +124,7 @@
     const score = parseInt(params.get('score') || '0', 10);
     const correct = parseInt(params.get('correct') || '0', 10);
 
-    const levelIcons = { beginner: '🌱', intermediate: '🌿', advanced: '🌳', expert: '⭐', master: '👑' };
+    const levelIcons = { beginner: '🌱', intermediate: '🌿', advanced: '🌳', expert: '⭐' };
     document.getElementById('statScore').textContent = score;
     document.getElementById('statCorrect').textContent = `${correct}/10`;
     document.getElementById('statLevel').textContent = levelIcons[level] || '—';

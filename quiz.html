@@ -118,35 +118,6 @@
       cursor: default;
     }
 
-    /* 마스터 레벨 텍스트 입력 */
-    .text-input-wrap {
-      padding: 0 20px;
-      display: none;
-    }
-    .text-input-wrap.show {
-      display: block;
-    }
-    .answer-input {
-      width: 100%;
-      padding: 16px 14px;
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--text-primary);
-      background: var(--card-bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      outline: none;
-      text-align: center;
-      font-family: 'Segoe UI', sans-serif;
-      margin-bottom: 10px;
-    }
-    .answer-input:focus {
-      border-color: var(--gold);
-    }
-    .answer-input:disabled {
-      opacity: 0.6;
-    }
-
     /* 피드백 */
     .feedback-box {
       margin: 16px 20px 0;
@@ -198,7 +169,6 @@
     }
   </style>
   <script src="./js/app.js?v=20260525-3"></script>
-  <script src="./js/word-data.js?v=20260525-3"></script>
 </head>
 <body>
   <div class="top-bar">
@@ -222,12 +192,6 @@
   <!-- 4지선다 -->
   <div class="choices-grid" id="choicesGrid"></div>
 
-  <!-- 마스터 레벨 직접 입력 -->
-  <div class="text-input-wrap" id="textInputWrap">
-    <input class="answer-input" id="answerInput" type="text" placeholder="한국어로 입력하세요" autocomplete="off">
-    <button class="btn-primary" id="submitBtn">제출 →</button>
-  </div>
-
   <div class="streak-badge" id="streakBadge"></div>
 
   <div class="feedback-box" id="feedbackBox">
@@ -242,331 +206,301 @@
   <script>
     const WEB_VERSION =
       new URLSearchParams(window.location.search).get('v') || '20260525-3';
-    const params = new URLSearchParams(location.search);
-    const level = params.get('level') || 'beginner';
+    const requestedLevel =
+      new URLSearchParams(location.search).get('level') || 'beginner';
+    const supportedLevels = ['beginner', 'intermediate', 'advanced', 'expert'];
+    const level = supportedLevels.includes(requestedLevel)
+      ? requestedLevel
+      : 'beginner';
     const TOTAL = 10;
 
-    const levelIcons = { beginner: '🌱', intermediate: '🌿', advanced: '🌳', expert: '⭐', master: '👑' };
-    const levelNames = { beginner: '입문', intermediate: '중급', advanced: '고급', expert: '특급', master: '초특급' };
+    const levelIcons = {
+      beginner: '🌱',
+      intermediate: '🌿',
+      advanced: '🌳',
+      expert: '⭐',
+    };
+    const levelNames = {
+      beginner: '입문',
+      intermediate: '중급',
+      advanced: '고급',
+      expert: '특급',
+    };
+
     const backUrl = new URL('index.html', location.href);
     backUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('backBtn').href = backUrl.toString();
     document.getElementById('levelBadge').textContent =
-      (levelIcons[level] || '') + ' ' + (levelNames[level] || level);
+      `${levelIcons[level] || ''} ${levelNames[level] || level}`.trim();
 
-    const wordData = window.WordData || {};
-    const fallbackLevel = wordData.beginner || [];
-    const pool = [...(wordData[level] || fallbackLevel)];
-    shuffle(pool);
-    const questions = pool.slice(0, TOTAL);
-
-    let current = 0;
-    let score = 0;
-    let correctCount = 0;
-    let streak = 0;
-
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
-    // ── 공통 UI 초기화 ──────────────────────────────────────────
-    function resetUI() {
-      document.getElementById('progressText').textContent = `${current + 1} / ${TOTAL}`;
-      document.getElementById('progressFill').style.width = `${(current / TOTAL) * 100}%`;
-      document.getElementById('feedbackBox').className = 'feedback-box';
-      document.getElementById('nextBtnWrap').className = 'next-btn-wrap';
-      document.getElementById('streakBadge').textContent = '';
+    function showQuizError(message) {
+      document.getElementById('choicesGrid').style.display = 'none';
+      document.getElementById('questionTypeLabel').textContent =
+        '문제를 불러오지 못했습니다';
+      document.getElementById('questionWord').textContent = message;
+      document.getElementById('questionWord').className = 'question-word small';
       document.getElementById('questionSubHint').textContent = '';
+      document.getElementById('feedbackBox').className = 'feedback-box wrong show';
+      document.getElementById('feedbackTitle').textContent = '오류';
+      document.getElementById('feedbackHint').textContent =
+        '단어 데이터가 비어 있거나 로드되지 않았습니다.';
+      document.getElementById('nextBtnWrap').className = 'next-btn-wrap';
     }
 
-    function showNextBtn() {
-      document.getElementById('nextBtnWrap').className = 'next-btn-wrap show';
-    }
+    const script = document.createElement('script');
+    script.src = `js/word-data-${level}.js?v=${encodeURIComponent(WEB_VERSION)}`;
+    script.onload = () => initQuiz();
+    script.onerror = () => showQuizError('레벨 데이터 파일을 불러오지 못했습니다.');
+    document.head.appendChild(script);
 
-    function applyStreak() {
-      let bonus = 0;
-      if (streak >= 5) bonus = 10;
-      else if (streak >= 3) bonus = 5;
-      score += 10 + bonus;
-      correctCount++;
-      const streakEl = document.getElementById('streakBadge');
-      if (streak >= 5) streakEl.textContent = `🔥 ${streak} streak! +10 bonus`;
-      else if (streak >= 3) streakEl.textContent = `🔥 ${streak} streak! +5 bonus`;
-      return bonus;
-    }
+    function initQuiz() {
+      const wordData = typeof WordData !== 'undefined' ? WordData : {};
+      const pool = [...(wordData[level] || [])];
 
-    // ── 렌더 진입점 ─────────────────────────────────────────────
-    function renderQuestion() {
-      resetUI();
-      const q = questions[current];
-
-      if (!q) {
-        document.getElementById('choicesGrid').style.display = 'none';
-        document.getElementById('textInputWrap').className = 'text-input-wrap';
-        document.getElementById('questionTypeLabel').textContent = '문제를 불러오지 못했습니다';
-        document.getElementById('questionWord').textContent = '데이터를 다시 확인해주세요.';
-        document.getElementById('questionWord').className = 'question-word small';
-        document.getElementById('feedbackBox').className = 'feedback-box wrong show';
-        document.getElementById('feedbackTitle').textContent = '오류';
-        document.getElementById('feedbackHint').textContent = '단어 데이터가 비어 있거나 로드되지 않았습니다.';
+      if (!pool.length) {
+        showQuizError('선택한 레벨의 데이터가 없습니다.');
         return;
       }
 
-      if (level === 'master') {
-        renderMaster(q);
-      } else if (level === 'advanced') {
-        renderAdvanced(q);
-      } else if (level === 'expert') {
-        renderExpert(q);
-      } else {
-        renderMCQ(q);
+      shuffle(pool);
+      const questions = pool.slice(0, TOTAL);
+
+      let current = 0;
+      let score = 0;
+      let correctCount = 0;
+      let streak = 0;
+
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
       }
-    }
 
-    // ── 입문 / 중급: 4지선다 한↔영 ─────────────────────────────
-    function renderMCQ(q) {
-      document.getElementById('choicesGrid').style.display = '';
-      document.getElementById('textInputWrap').className = 'text-input-wrap';
+      function resetUI() {
+        document.getElementById('progressText').textContent = `${current + 1} / ${TOTAL}`;
+        document.getElementById('progressFill').style.width = `${(current / TOTAL) * 100}%`;
+        document.getElementById('feedbackBox').className = 'feedback-box';
+        document.getElementById('nextBtnWrap').className = 'next-btn-wrap';
+        document.getElementById('streakBadge').textContent = '';
+        document.getElementById('questionSubHint').textContent = '';
+      }
 
-      const typeA = Math.random() < 0.5;
-      if (typeA) {
+      function showNextBtn() {
+        document.getElementById('nextBtnWrap').className = 'next-btn-wrap show';
+      }
+
+      function applyStreak() {
+        let bonus = 0;
+        if (streak >= 5) bonus = 10;
+        else if (streak >= 3) bonus = 5;
+        score += 10 + bonus;
+        correctCount++;
+        const streakEl = document.getElementById('streakBadge');
+        if (streak >= 5) streakEl.textContent = `🔥 ${streak} streak! +10 bonus`;
+        else if (streak >= 3) streakEl.textContent = `🔥 ${streak} streak! +5 bonus`;
+      }
+
+      function renderQuestion() {
+        resetUI();
+        const q = questions[current];
+
+        if (!q) {
+          showQuizError('데이터를 다시 확인해주세요.');
+          return;
+        }
+
+        if (level === 'advanced') {
+          renderAdvanced(q);
+        } else if (level === 'expert') {
+          renderExpert(q);
+        } else {
+          renderMCQ(q);
+        }
+      }
+
+      function renderMCQ(q) {
+        document.getElementById('choicesGrid').style.display = '';
+
+        const typeA = Math.random() < 0.5;
+        if (typeA) {
+          document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
+          document.getElementById('questionWord').textContent = q.korean;
+          document.getElementById('questionWord').className = 'question-word';
+          buildChoices(q, 'english', pool);
+        } else {
+          document.getElementById('questionTypeLabel').textContent = 'What is the Korean word?';
+          document.getElementById('questionWord').textContent = q.english;
+          document.getElementById('questionWord').className = 'question-word';
+          buildChoices(q, 'korean', pool);
+        }
+      }
+
+      function buildChoices(q, field, allWords) {
+        const correct = q[field];
+        const others = shuffle(
+          allWords.filter(w => w[field] !== correct).map(w => w[field])
+        ).slice(0, 3);
+        const options = shuffle([correct, ...others]);
+
+        const grid = document.getElementById('choicesGrid');
+        grid.innerHTML = '';
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'choice-btn';
+          btn.textContent = opt;
+          btn.addEventListener('click', () => {
+            handleMCQChoice(btn, opt, correct, q.hint || '');
+          });
+          grid.appendChild(btn);
+        });
+      }
+
+      function handleMCQChoice(btn, selected, correct, hint) {
+        document.querySelectorAll('.choice-btn').forEach(b => {
+          b.disabled = true;
+          if (b.textContent === correct) b.classList.add('correct');
+        });
+
+        const fb = document.getElementById('feedbackBox');
+        const title = document.getElementById('feedbackTitle');
+        const hintEl = document.getElementById('feedbackHint');
+
+        if (selected === correct) {
+          btn.classList.add('correct');
+          streak++;
+          applyStreak();
+          fb.className = 'feedback-box correct show';
+          title.textContent = '✓ Correct!';
+          hintEl.textContent = hint ? `Hint: ${hint}` : '';
+        } else {
+          btn.classList.add('wrong');
+          streak = 0;
+          fb.className = 'feedback-box wrong show';
+          title.textContent = '✗ Wrong!';
+          hintEl.textContent = `Correct: ${correct}${hint ? ' · Hint: ' + hint : ''}`;
+        }
+        showNextBtn();
+      }
+
+      function renderAdvanced(q) {
+        document.getElementById('choicesGrid').style.display = '';
+        document.getElementById('questionTypeLabel').textContent = '빈칸에 알맞은 말은?';
+        document.getElementById('questionWord').textContent = q.korean;
+        document.getElementById('questionWord').className = 'question-word small';
+        document.getElementById('questionSubHint').textContent = q.english;
+
+        const others = shuffle(
+          pool.filter(w => w.answer !== q.answer).map(w => w.answer)
+        ).slice(0, 3);
+        const options = shuffle([q.answer, ...others]);
+
+        const grid = document.getElementById('choicesGrid');
+        grid.innerHTML = '';
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'choice-btn';
+          btn.textContent = opt;
+          btn.addEventListener('click', () => handleAdvancedChoice(btn, opt, q));
+          grid.appendChild(btn);
+        });
+      }
+
+      function handleAdvancedChoice(btn, selected, q) {
+        document.querySelectorAll('.choice-btn').forEach(b => {
+          b.disabled = true;
+          if (b.textContent === q.answer) b.classList.add('correct');
+        });
+
+        const fb = document.getElementById('feedbackBox');
+        const title = document.getElementById('feedbackTitle');
+        const hintEl = document.getElementById('feedbackHint');
+        const fullSentence = q.korean.replace('___', `【${q.answer}】`);
+
+        if (selected === q.answer) {
+          btn.classList.add('correct');
+          streak++;
+          applyStreak();
+          fb.className = 'feedback-box correct show';
+          title.textContent = '✓ Correct!';
+          hintEl.innerHTML = `<strong>${fullSentence}</strong><br><em>${q.english}</em><br>💡 ${q.hint}`;
+        } else {
+          btn.classList.add('wrong');
+          streak = 0;
+          fb.className = 'feedback-box wrong show';
+          title.textContent = '✗ Wrong!';
+          hintEl.innerHTML = `<strong>${fullSentence}</strong><br><em>${q.english}</em><br>💡 ${q.hint}`;
+        }
+        showNextBtn();
+      }
+
+      function renderExpert(q) {
+        document.getElementById('choicesGrid').style.display = '';
         document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
         document.getElementById('questionWord').textContent = q.korean;
         document.getElementById('questionWord').className = 'question-word';
-        buildChoices(q, 'english', pool);
-      } else {
-        document.getElementById('questionTypeLabel').textContent = 'What is the Korean word?';
-        document.getElementById('questionWord').textContent = q.english;
-        document.getElementById('questionWord').className = 'question-word';
-        buildChoices(q, 'korean', pool);
-      }
-    }
 
-    function buildChoices(q, field, allWords) {
-      const correct = q[field];
-      const others = shuffle(
-        allWords.filter(w => w[field] !== correct).map(w => w[field])
-      ).slice(0, 3);
-      const options = shuffle([correct, ...others]);
+        const others = shuffle(
+          pool.filter(w => w.english !== q.english).map(w => w.english)
+        ).slice(0, 3);
+        const options = shuffle([q.english, ...others]);
 
-      const grid = document.getElementById('choicesGrid');
-      grid.innerHTML = '';
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.textContent = opt;
-        btn.addEventListener('click', () => {
-          handleMCQChoice(btn, opt, correct, q.hint || '');
+        const grid = document.getElementById('choicesGrid');
+        grid.innerHTML = '';
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'choice-btn';
+          btn.textContent = opt;
+          btn.addEventListener('click', () => handleExpertChoice(btn, opt, q));
+          grid.appendChild(btn);
         });
-        grid.appendChild(btn);
-      });
-    }
-
-    function handleMCQChoice(btn, selected, correct, hint) {
-      document.querySelectorAll('.choice-btn').forEach(b => {
-        b.disabled = true;
-        if (b.textContent === correct) b.classList.add('correct');
-      });
-
-      const fb = document.getElementById('feedbackBox');
-      const title = document.getElementById('feedbackTitle');
-      const hintEl = document.getElementById('feedbackHint');
-
-      if (selected === correct) {
-        btn.classList.add('correct');
-        streak++;
-        applyStreak();
-        fb.className = 'feedback-box correct show';
-        title.textContent = '✓ Correct!';
-        hintEl.textContent = hint ? `Hint: ${hint}` : '';
-      } else {
-        btn.classList.add('wrong');
-        streak = 0;
-        fb.className = 'feedback-box wrong show';
-        title.textContent = '✗ Wrong!';
-        hintEl.textContent = `Correct: ${correct}${hint ? ' · Hint: ' + hint : ''}`;
       }
-      showNextBtn();
-    }
 
-    // ── 고급: 속담 빈칸 채우기 ──────────────────────────────────
-    function renderAdvanced(q) {
-      document.getElementById('choicesGrid').style.display = '';
-      document.getElementById('textInputWrap').className = 'text-input-wrap';
+      function handleExpertChoice(btn, selected, q) {
+        document.querySelectorAll('.choice-btn').forEach(b => {
+          b.disabled = true;
+          if (b.textContent === q.english) b.classList.add('correct');
+        });
 
-      document.getElementById('questionTypeLabel').textContent = '빈칸에 알맞은 말은?';
-      document.getElementById('questionWord').textContent = q.korean;
-      document.getElementById('questionWord').className = 'question-word small';
-      document.getElementById('questionSubHint').textContent = q.english;
+        const fb = document.getElementById('feedbackBox');
+        const title = document.getElementById('feedbackTitle');
+        const hintEl = document.getElementById('feedbackHint');
 
-      const others = shuffle(
-        pool.filter(w => w.answer !== q.answer).map(w => w.answer)
-      ).slice(0, 3);
-      const options = shuffle([q.answer, ...others]);
-
-      const grid = document.getElementById('choicesGrid');
-      grid.innerHTML = '';
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.textContent = opt;
-        btn.addEventListener('click', () => handleAdvancedChoice(btn, opt, q));
-        grid.appendChild(btn);
-      });
-    }
-
-    function handleAdvancedChoice(btn, selected, q) {
-      document.querySelectorAll('.choice-btn').forEach(b => {
-        b.disabled = true;
-        if (b.textContent === q.answer) b.classList.add('correct');
-      });
-
-      const fb = document.getElementById('feedbackBox');
-      const title = document.getElementById('feedbackTitle');
-      const hintEl = document.getElementById('feedbackHint');
-      const fullSentence = q.korean.replace('___', `【${q.answer}】`);
-
-      if (selected === q.answer) {
-        btn.classList.add('correct');
-        streak++;
-        applyStreak();
-        fb.className = 'feedback-box correct show';
-        title.textContent = '✓ Correct!';
-        hintEl.innerHTML = `<strong>${fullSentence}</strong><br><em>${q.english}</em><br>💡 ${q.hint}`;
-      } else {
-        btn.classList.add('wrong');
-        streak = 0;
-        fb.className = 'feedback-box wrong show';
-        title.textContent = '✗ Wrong!';
-        hintEl.innerHTML = `<strong>${fullSentence}</strong><br><em>${q.english}</em><br>💡 ${q.hint}`;
+        if (selected === q.english) {
+          btn.classList.add('correct');
+          streak++;
+          applyStreak();
+          fb.className = 'feedback-box correct show';
+          title.textContent = '✓ Correct!';
+          hintEl.innerHTML = `동의어: <strong>${q.synonym}</strong><br>예문: <em>${q.usage}</em>`;
+        } else {
+          btn.classList.add('wrong');
+          streak = 0;
+          fb.className = 'feedback-box wrong show';
+          title.textContent = '✗ Wrong!';
+          hintEl.innerHTML = `정답: <strong>${q.english}</strong><br>동의어: ${q.synonym}<br>예문: <em>${q.usage}</em>`;
+        }
+        showNextBtn();
       }
-      showNextBtn();
-    }
 
-    // ── 특급: 다의어/유의어 4지선다 ────────────────────────────
-    function renderExpert(q) {
-      document.getElementById('choicesGrid').style.display = '';
-      document.getElementById('textInputWrap').className = 'text-input-wrap';
-
-      document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
-      document.getElementById('questionWord').textContent = q.korean;
-      document.getElementById('questionWord').className = 'question-word';
-
-      const others = shuffle(
-        pool.filter(w => w.english !== q.english).map(w => w.english)
-      ).slice(0, 3);
-      const options = shuffle([q.english, ...others]);
-
-      const grid = document.getElementById('choicesGrid');
-      grid.innerHTML = '';
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.textContent = opt;
-        btn.addEventListener('click', () => handleExpertChoice(btn, opt, q));
-        grid.appendChild(btn);
-      });
-    }
-
-    function handleExpertChoice(btn, selected, q) {
-      document.querySelectorAll('.choice-btn').forEach(b => {
-        b.disabled = true;
-        if (b.textContent === q.english) b.classList.add('correct');
+      document.getElementById('nextBtn').addEventListener('click', () => {
+        current++;
+        if (current >= TOTAL) {
+          const query = new URLSearchParams({
+            level,
+            score: String(score),
+            correct: String(correctCount),
+            v: WEB_VERSION,
+          }).toString();
+          location.href = `result.html?${query}`;
+        } else {
+          renderQuestion();
+        }
       });
 
-      const fb = document.getElementById('feedbackBox');
-      const title = document.getElementById('feedbackTitle');
-      const hintEl = document.getElementById('feedbackHint');
-
-      if (selected === q.english) {
-        btn.classList.add('correct');
-        streak++;
-        applyStreak();
-        fb.className = 'feedback-box correct show';
-        title.textContent = '✓ Correct!';
-        hintEl.innerHTML = `동의어: <strong>${q.synonym}</strong><br>예문: <em>${q.usage}</em>`;
-      } else {
-        btn.classList.add('wrong');
-        streak = 0;
-        fb.className = 'feedback-box wrong show';
-        title.textContent = '✗ Wrong!';
-        hintEl.innerHTML = `정답: <strong>${q.english}</strong><br>동의어: ${q.synonym}<br>예문: <em>${q.usage}</em>`;
-      }
-      showNextBtn();
+      renderQuestion();
     }
-
-    // ── 초특급: 낱말퍼즐 텍스트 입력 ────────────────────────────
-    function renderMaster(q) {
-      document.getElementById('choicesGrid').style.display = 'none';
-      document.getElementById('textInputWrap').className = 'text-input-wrap show';
-
-      document.getElementById('questionTypeLabel').textContent = '한국어 단어를 입력하세요';
-      document.getElementById('questionWord').textContent = q.clue;
-      document.getElementById('questionWord').className = 'question-word small';
-
-      const input = document.getElementById('answerInput');
-      input.value = '';
-      input.disabled = false;
-      document.getElementById('submitBtn').disabled = false;
-      setTimeout(() => input.focus(), 100);
-    }
-
-    function handleMasterSubmit() {
-      const q = questions[current];
-      const input = document.getElementById('answerInput');
-      const userAnswer = input.value.trim();
-
-      if (!userAnswer) return;
-
-      input.disabled = true;
-      document.getElementById('submitBtn').disabled = true;
-
-      const fb = document.getElementById('feedbackBox');
-      const title = document.getElementById('feedbackTitle');
-      const hintEl = document.getElementById('feedbackHint');
-
-      if (userAnswer === q.answer) {
-        streak++;
-        applyStreak();
-        fb.className = 'feedback-box correct show';
-        title.textContent = '✓ Correct!';
-        hintEl.innerHTML = `정답: <strong>${q.answer}</strong><br>💡 ${q.hint}`;
-      } else {
-        streak = 0;
-        fb.className = 'feedback-box wrong show';
-        title.textContent = '✗ Wrong!';
-        hintEl.innerHTML = `정답: <strong>${q.answer}</strong><br>💡 ${q.hint}`;
-      }
-      showNextBtn();
-    }
-
-    // 제출 버튼 이벤트
-    document.getElementById('submitBtn').addEventListener('click', handleMasterSubmit);
-    document.getElementById('answerInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleMasterSubmit();
-    });
-
-    // 다음 문제
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      current++;
-      if (current >= TOTAL) {
-        const query = new URLSearchParams({
-          level,
-          score: String(score),
-          correct: String(correctCount),
-          v: WEB_VERSION,
-        }).toString();
-        location.href = `result.html?${query}`;
-      } else {
-        renderQuestion();
-      }
-    });
-
-    renderQuestion();
   </script>
 </body>
 </html>
