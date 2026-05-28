@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Quiz – Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260525-3">
+  <link rel="stylesheet" href="./css/base.css?v=20260527-1">
   <style>
     .top-bar {
       display: flex;
@@ -193,8 +193,38 @@
       border-color: var(--gold);
       color: #fff;
     }
+
+    @media (min-width: 520px) {
+      .question-word {
+        font-size: 36px;
+      }
+      .question-word.small {
+        font-size: 26px;
+      }
+      .choice-btn {
+        font-size: 17px;
+        min-height: 72px;
+        padding: 18px 12px;
+      }
+      .dir-btn {
+        font-size: 15px;
+        padding: 12px 10px;
+      }
+      .top-bar,
+      .progress-bar-wrap,
+      .choices-grid,
+      .dir-toggle-wrap {
+        padding-left: 28px;
+        padding-right: 28px;
+      }
+      .question-card {
+        margin-left: 28px;
+        margin-right: 28px;
+        min-height: 160px;
+      }
+    }
   </style>
-  <script src="./js/app.js?v=20260525-3"></script>
+  <script src="./js/app.js?v=20260527-1"></script>
 </head>
 <body>
   <div class="top-bar">
@@ -237,7 +267,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260525-3';
+      new URLSearchParams(window.location.search).get('v') || '20260527-1';
     const requestedLevel =
       new URLSearchParams(location.search).get('level') || 'beginner';
     const supportedLevels = ['beginner', 'intermediate', 'advanced', 'expert'];

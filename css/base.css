@@ -44,9 +44,32 @@ html, body {
 }
 
 body {
-  max-width: 480px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   padding-bottom: 60px;
+  min-height: 100%;
+}
+
+/* 태블릿·에뮬레이터 등 넓은 화면에서 가독성 확대 */
+@media (min-width: 520px) {
+  html {
+    font-size: 18px;
+  }
+
+  .btn-primary {
+    font-size: 18px;
+    padding: 18px;
+  }
+
+  .btn-secondary {
+    font-size: 17px;
+    padding: 16px;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
 }
 
 .btn-primary {

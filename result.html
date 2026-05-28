@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Result – Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260525-3">
+  <link rel="stylesheet" href="./css/base.css?v=20260527-1">
   <style>
     @keyframes popIn {
       0% { transform: scale(0.3); opacity: 0; }
@@ -87,7 +87,7 @@
       gap: 10px;
     }
   </style>
-  <script src="./js/app.js?v=20260525-3"></script>
+  <script src="./js/app.js?v=20260527-1"></script>
 </head>
 <body>
   <div class="result-wrap">
@@ -118,7 +118,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260525-3';
+      new URLSearchParams(window.location.search).get('v') || '20260527-1';
     const params = new URLSearchParams(location.search);
     const level = params.get('level') || 'beginner';
     const score = parseInt(params.get('score') || '0', 10);

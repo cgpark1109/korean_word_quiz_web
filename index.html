@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260525-3">
+  <link rel="stylesheet" href="./css/base.css?v=20260527-1">
   <style>
     .header {
       padding: 40px 24px 24px;
@@ -110,8 +110,52 @@
       cursor: pointer;
       width: 100%;
     }
+
+    @media (min-width: 520px) {
+      .header {
+        padding: 48px 32px 28px;
+      }
+      .app-title {
+        font-size: 32px;
+      }
+      .app-subtitle {
+        font-size: 16px;
+      }
+      .deco-word {
+        font-size: 56px;
+      }
+      .section-label {
+        font-size: 15px;
+        padding: 0 28px 12px;
+      }
+      .level-list {
+        gap: 14px;
+        padding: 0 28px;
+      }
+      .level-card {
+        height: 96px;
+        padding: 0 24px;
+        gap: 20px;
+      }
+      .level-icon {
+        font-size: 36px;
+      }
+      .level-name {
+        font-size: 20px;
+      }
+      .level-sub {
+        font-size: 15px;
+      }
+      .footer-btn {
+        padding: 24px 28px 0;
+      }
+      .settings-btn {
+        font-size: 17px;
+        padding: 16px;
+      }
+    }
   </style>
-  <script src="./js/app.js?v=20260525-3"></script>
+  <script src="./js/app.js?v=20260527-1"></script>
 </head>
 <body>
   <div class="header">
@@ -132,7 +176,7 @@
       <span class="level-icon">🌱</span>
       <div class="level-info">
         <div class="level-name">입문 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Beginner</span></div>
-        <div class="level-sub">30 words · 일상 단어 4지선다</div>
+        <div class="level-sub">50 words · 일상 단어 4지선다</div>
       </div>
       <span class="level-arrow">›</span>
     </button>
@@ -173,7 +217,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260525-3';
+      new URLSearchParams(window.location.search).get('v') || '20260527-1';
 
     document.addEventListener('DOMContentLoaded', () => {
       loadNotice();
