@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260527-1">
+  <link rel="stylesheet" href="./css/base.css?v=20260528-1">
   <style>
     .header {
       padding: 40px 24px 24px;
@@ -155,7 +155,7 @@
       }
     }
   </style>
-  <script src="./js/app.js?v=20260527-1"></script>
+  <script src="./js/app.js?v=20260528-1"></script>
 </head>
 <body>
   <div class="header">
@@ -176,7 +176,7 @@
       <span class="level-icon">🌱</span>
       <div class="level-info">
         <div class="level-name">입문 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Beginner</span></div>
-        <div class="level-sub">50 words · 일상 단어 4지선다</div>
+        <div class="level-sub">50 words · 5 stages × 10 questions</div>
       </div>
       <span class="level-arrow">›</span>
     </button>
@@ -185,7 +185,7 @@
       <span class="level-icon">🌿</span>
       <div class="level-info">
         <div class="level-name">중급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Intermediate</span></div>
-        <div class="level-sub">30 idioms · 사자성어 4지선다</div>
+        <div class="level-sub">30 words · 3 stages × 10 questions</div>
       </div>
       <span class="level-arrow">›</span>
     </button>
@@ -194,7 +194,7 @@
       <span class="level-icon">🌳</span>
       <div class="level-info">
         <div class="level-name">고급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Advanced</span></div>
-        <div class="level-sub">30 proverbs · 속담 빈칸 채우기</div>
+        <div class="level-sub">30 proverbs · 3 stages × 10 questions</div>
       </div>
       <span class="level-arrow">›</span>
     </button>
@@ -203,7 +203,7 @@
       <span class="level-icon">⭐</span>
       <div class="level-info">
         <div class="level-name">특급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Expert</span></div>
-        <div class="level-sub">30 words · 다의어·유의어</div>
+        <div class="level-sub">20 words · 2 stages × 10 questions</div>
       </div>
       <span class="level-arrow">›</span>
     </button>
@@ -217,7 +217,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260527-1';
+      new URLSearchParams(window.location.search).get('v') || '20260528-1';
 
     document.addEventListener('DOMContentLoaded', () => {
       loadNotice();
@@ -233,7 +233,7 @@
         card.addEventListener('click', () => {
           const level = card.dataset.level;
           if (!level) return;
-          const nextUrl = new URL('quiz.html', location.href);
+          const nextUrl = new URL('stages.html', location.href);
           nextUrl.searchParams.set('level', level);
           nextUrl.searchParams.set('v', WEB_VERSION);
           location.href = nextUrl.toString();

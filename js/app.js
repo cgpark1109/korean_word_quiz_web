@@ -37,7 +37,7 @@
 async function loadNotice() {
   try {
     const version =
-      new URLSearchParams(window.location.search).get('v') || '20260527-1';
+      new URLSearchParams(window.location.search).get('v') || '20260528-1';
     const res = await fetch('./notice.json?v=' + encodeURIComponent(version));
     const data = await res.json();
     if (data.popup?.active) {

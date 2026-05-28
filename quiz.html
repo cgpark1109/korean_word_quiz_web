@@ -4,8 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Quiz – Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260527-1">
+  <link rel="stylesheet" href="./css/base.css?v=20260528-1">
   <style>
+    body.quiz-page {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 100dvh;
+      max-width: 100%;
+      padding-bottom: 0;
+    }
+    .quiz-header {
+      flex-shrink: 0;
+    }
+    .quiz-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      justify-content: space-between;
+    }
+    .quiz-center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      padding: 4px 0 12px;
+    }
+    .quiz-bottom {
+      flex-shrink: 0;
+      padding-bottom: 12px;
+    }
     .top-bar {
       display: flex;
       align-items: center;
@@ -49,7 +79,7 @@
       transition: width 0.3s ease;
     }
     .question-card {
-      margin: 0 20px 20px;
+      margin: 0 20px;
       padding: 28px 20px;
       text-align: center;
       min-height: 140px;
@@ -144,7 +174,7 @@
       margin-bottom: 6px;
     }
     .streak-badge {
-      margin: 10px 20px 0;
+      margin: 0 20px 8px;
       text-align: center;
       font-size: 13px;
       font-weight: 600;
@@ -152,7 +182,7 @@
       min-height: 20px;
     }
     .next-btn-wrap {
-      padding: 16px 20px 0;
+      padding: 8px 20px 0;
       display: none;
     }
     .next-btn-wrap.show {
@@ -224,57 +254,74 @@
       }
     }
   </style>
-  <script src="./js/app.js?v=20260527-1"></script>
+  <script src="./js/app.js?v=20260528-1"></script>
 </head>
-<body>
-  <div class="top-bar">
-    <a class="back-btn" id="backBtn" href="index.html">←</a>
-    <span class="level-badge" id="levelBadge"></span>
-    <span class="progress-text" id="progressText">1 / 10</span>
-  </div>
-
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+<body class="quiz-page">
+  <header class="quiz-header">
+    <div class="top-bar">
+      <a class="back-btn" id="backBtn" href="index.html">←</a>
+      <span class="level-badge" id="levelBadge"></span>
+      <span class="progress-text" id="progressText">1 / 10</span>
     </div>
-  </div>
 
-  <!-- 방향 선택 토글: 입문·중급 전용, JS가 필요 시 노출 -->
-  <div class="dir-toggle-wrap" id="dirToggleWrap" style="display:none;">
-    <button class="dir-btn active" id="dirBtnKO">한글 → 영어</button>
-    <button class="dir-btn" id="dirBtnEN">영어 → 한글</button>
-  </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+  </header>
 
-  <div class="card question-card">
-    <div class="question-type-label" id="questionTypeLabel"></div>
-    <div class="question-word" id="questionWord"></div>
-    <div class="question-hint" id="questionSubHint"></div>
-  </div>
+  <main class="quiz-main">
+    <div class="quiz-center">
+      <div class="dir-toggle-wrap" id="dirToggleWrap" style="display:none;">
+        <button class="dir-btn active" id="dirBtnKO">한글 → 영어</button>
+        <button class="dir-btn" id="dirBtnEN">영어 → 한글</button>
+      </div>
 
-  <!-- 4지선다 -->
-  <div class="choices-grid" id="choicesGrid"></div>
+      <div class="card question-card">
+        <div class="question-type-label" id="questionTypeLabel"></div>
+        <div class="question-word" id="questionWord"></div>
+        <div class="question-hint" id="questionSubHint"></div>
+      </div>
 
-  <div class="streak-badge" id="streakBadge"></div>
+      <div class="choices-grid" id="choicesGrid"></div>
+    </div>
 
-  <div class="feedback-box" id="feedbackBox">
-    <div class="feedback-title" id="feedbackTitle"></div>
-    <div id="feedbackHint"></div>
-  </div>
+    <div class="quiz-bottom">
+      <div class="streak-badge" id="streakBadge"></div>
 
-  <div class="next-btn-wrap" id="nextBtnWrap">
-    <button class="btn-primary" id="nextBtn">Next →</button>
-  </div>
+      <div class="feedback-box" id="feedbackBox">
+        <div class="feedback-title" id="feedbackTitle"></div>
+        <div id="feedbackHint"></div>
+      </div>
+
+      <div class="next-btn-wrap" id="nextBtnWrap">
+        <button class="btn-primary" id="nextBtn">Next →</button>
+      </div>
+    </div>
+  </main>
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260527-1';
-    const requestedLevel =
-      new URLSearchParams(location.search).get('level') || 'beginner';
+      new URLSearchParams(window.location.search).get('v') || '20260528-1';
+    const urlParams = new URLSearchParams(location.search);
+    const requestedLevel = urlParams.get('level') || 'beginner';
     const supportedLevels = ['beginner', 'intermediate', 'advanced', 'expert'];
     const level = supportedLevels.includes(requestedLevel)
       ? requestedLevel
       : 'beginner';
-    const TOTAL = 10;
+    const QUESTIONS_PER_STAGE = 10;
+    const wordCounts = {
+      beginner: 50,
+      intermediate: 30,
+      advanced: 30,
+      expert: 20,
+    };
+    const totalStages = Math.ceil((wordCounts[level] || 30) / QUESTIONS_PER_STAGE);
+    let stage = parseInt(urlParams.get('stage') || '1', 10);
+    if (!Number.isFinite(stage) || stage < 1) stage = 1;
+    if (stage > totalStages) stage = totalStages;
+    const TOTAL = QUESTIONS_PER_STAGE;
 
     const levelIcons = {
       beginner: '🌱',
@@ -289,11 +336,12 @@
       expert: '특급',
     };
 
-    const backUrl = new URL('index.html', location.href);
+    const backUrl = new URL('stages.html', location.href);
+    backUrl.searchParams.set('level', level);
     backUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('backBtn').href = backUrl.toString();
     document.getElementById('levelBadge').textContent =
-      `${levelIcons[level] || ''} ${levelNames[level] || level}`.trim();
+      `${levelIcons[level] || ''} ${levelNames[level] || level} · Stage ${stage}`.trim();
 
     function showQuizError(message) {
       document.getElementById('choicesGrid').style.display = 'none';
@@ -324,8 +372,13 @@
         return;
       }
 
-      shuffle(pool);
-      const questions = pool.slice(0, TOTAL);
+      const startIdx = (stage - 1) * QUESTIONS_PER_STAGE;
+      const stageWords = pool.slice(startIdx, startIdx + QUESTIONS_PER_STAGE);
+      if (stageWords.length < TOTAL) {
+        showQuizError('이 스테이지에 문제가 충분하지 않습니다.');
+        return;
+      }
+      const questions = shuffle([...stageWords]);
 
       let current = 0;
       let score = 0;
@@ -598,8 +651,10 @@
         if (current >= TOTAL) {
           const query = new URLSearchParams({
             level,
+            stage: String(stage),
             score: String(score),
             correct: String(correctCount),
+            totalStages: String(totalStages),
             v: WEB_VERSION,
           }).toString();
           location.href = `result.html?${query}`;

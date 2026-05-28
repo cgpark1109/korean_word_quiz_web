@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Stages – Korean Word Quiz</title>
+  <link rel="stylesheet" href="./css/base.css?v=20260528-1">
+  <style>
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px 12px;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+    }
+    .page-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .stage-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 0 20px 14px;
+      line-height: 1.5;
+    }
+    .stage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 20px 24px;
+    }
+    .stage-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      min-height: 72px;
+      padding: 14px 18px;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: left;
+    }
+    .stage-card:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .stage-card.cleared {
+      border-color: var(--correct-text);
+    }
+    .stage-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .stage-card:disabled .stage-num {
+      background: var(--border);
+      color: var(--text-muted);
+    }
+    .stage-info {
+      flex: 1;
+    }
+    .stage-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .stage-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .stage-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--correct-text);
+    }
+    .stage-lock {
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+  </style>
+  <script src="./js/app.js?v=20260528-1"></script>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="back-btn" id="backBtn" href="index.html">←</a>
+    <div class="page-title" id="pageTitle">Stages</div>
+  </div>
+  <p class="stage-hint" id="stageHint">Each stage has 10 questions.</p>
+  <div class="stage-list" id="stageList"></div>
+
+  <script>
+    const WEB_VERSION =
+      new URLSearchParams(window.location.search).get('v') || '20260528-1';
+    const QUESTIONS_PER_STAGE = 10;
+    const level = new URLSearchParams(location.search).get('level') || 'beginner';
+    const wordCounts = {
+      beginner: 50,
+      intermediate: 30,
+      advanced: 30,
+      expert: 20,
+    };
+    const levelIcons = {
+      beginner: '🌱',
+      intermediate: '🌿',
+      advanced: '🌳',
+      expert: '⭐',
+    };
+    const levelNames = {
+      beginner: '입문',
+      intermediate: '중급',
+      advanced: '고급',
+      expert: '특급',
+    };
+
+    const totalWords = wordCounts[level] || 30;
+    const totalStages = Math.ceil(totalWords / QUESTIONS_PER_STAGE);
+
+    document.getElementById('pageTitle').textContent =
+      `${levelIcons[level] || ''} ${levelNames[level] || level} · Stages`.trim();
+    document.getElementById('stageHint').textContent =
+      `${totalStages} stages · 10 questions each · ${totalWords} words total`;
+
+    const backUrl = new URL('index.html', location.href);
+    backUrl.searchParams.set('v', WEB_VERSION);
+    document.getElementById('backBtn').href = backUrl.toString();
+
+    function stageKey(n) {
+      return `stage_cleared_${level}_${n}`;
+    }
+
+    function isUnlocked(n) {
+      if (n === 1) return true;
+      return localStorage.getItem(stageKey(n - 1)) === 'true';
+    }
+
+    function isCleared(n) {
+      return localStorage.getItem(stageKey(n)) === 'true';
+    }
+
+    const list = document.getElementById('stageList');
+    for (let n = 1; n <= totalStages; n++) {
+      const start = (n - 1) * QUESTIONS_PER_STAGE + 1;
+      const end = Math.min(n * QUESTIONS_PER_STAGE, totalWords);
+      const unlocked = isUnlocked(n);
+      const cleared = isCleared(n);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'stage-card' + (cleared ? ' cleared' : '');
+      btn.disabled = !unlocked;
+
+      btn.innerHTML = `
+        <span class="stage-num">${n}</span>
+        <span class="stage-info">
+          <div class="stage-name">Stage ${n}</div>
+          <div class="stage-sub">Words ${start}–${end} · 10 questions</div>
+        </span>
+        ${cleared ? '<span class="stage-badge">✓ Done</span>' : (unlocked ? '<span class="stage-badge" style="color:var(--gold)">Play →</span>' : '<span class="stage-lock">🔒</span>')}
+      `;
+
+      if (unlocked) {
+        btn.addEventListener('click', () => {
+          const url = new URL('quiz.html', location.href);
+          url.searchParams.set('level', level);
+          url.searchParams.set('stage', String(n));
+          url.searchParams.set('v', WEB_VERSION);
+          location.href = url.toString();
+        });
+      }
+
+      list.appendChild(btn);
+    }
+  </script>
+</body>
+</html>

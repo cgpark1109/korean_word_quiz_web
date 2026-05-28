@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Result – Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260527-1">
+  <link rel="stylesheet" href="./css/base.css?v=20260528-1">
   <style>
     @keyframes popIn {
       0% { transform: scale(0.3); opacity: 0; }
@@ -12,8 +12,15 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
+    body.result-page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      justify-content: center;
+    }
+
     .result-wrap {
-      padding: 40px 20px 20px;
+      padding: 32px 20px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -47,6 +54,13 @@
       font-weight: 700;
       color: var(--text-primary);
       text-align: center;
+    }
+
+    .result-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: -12px;
     }
 
     .stats-card {
@@ -87,13 +101,16 @@
       gap: 10px;
     }
   </style>
-  <script src="./js/app.js?v=20260527-1"></script>
+  <script src="./js/app.js?v=20260528-1"></script>
 </head>
-<body>
+<body class="result-page">
   <div class="result-wrap">
     <div class="stars-row" id="starsRow"></div>
 
-    <div class="result-title">Quiz Complete! 🎉</div>
+    <div>
+      <div class="result-title" id="resultTitle">Stage Complete! 🎉</div>
+      <div class="result-subtitle" id="resultSubtitle"></div>
+    </div>
 
     <div class="card stats-card">
       <div class="stat-item">
@@ -106,28 +123,44 @@
       </div>
       <div class="stat-item">
         <div class="stat-value" id="statLevel"></div>
-        <div class="stat-label">Level</div>
+        <div class="stat-label">Stage</div>
       </div>
     </div>
 
     <div class="action-btns">
+      <a class="btn-primary" id="nextStageLink" href="#" style="display:none;">Next Stage →</a>
       <a class="btn-primary" id="tryAgainLink" href="#">Try Again</a>
+      <a class="btn-secondary" id="stagesLink" href="#">All Stages</a>
       <a class="btn-secondary" id="homeLink" href="index.html">Home</a>
     </div>
   </div>
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260527-1';
+      new URLSearchParams(window.location.search).get('v') || '20260528-1';
     const params = new URLSearchParams(location.search);
     const level = params.get('level') || 'beginner';
+    const stage = parseInt(params.get('stage') || '1', 10);
+    const totalStages = parseInt(params.get('totalStages') || '1', 10);
     const score = parseInt(params.get('score') || '0', 10);
     const correct = parseInt(params.get('correct') || '0', 10);
+    const QUESTIONS_PER_STAGE = 10;
 
     const levelIcons = { beginner: '🌱', intermediate: '🌿', advanced: '🌳', expert: '⭐' };
+    const levelNames = {
+      beginner: '입문',
+      intermediate: '중급',
+      advanced: '고급',
+      expert: '특급',
+    };
+
+    localStorage.setItem(`stage_cleared_${level}_${stage}`, 'true');
+
+    document.getElementById('resultSubtitle').textContent =
+      `${levelNames[level] || level} · Stage ${stage} of ${totalStages}`;
     document.getElementById('statScore').textContent = score;
-    document.getElementById('statCorrect').textContent = `${correct}/10`;
-    document.getElementById('statLevel').textContent = levelIcons[level] || '—';
+    document.getElementById('statCorrect').textContent = `${correct}/${QUESTIONS_PER_STAGE}`;
+    document.getElementById('statLevel').textContent = stage;
 
     const starsRow = document.getElementById('starsRow');
     let filledStars = 1;
@@ -150,18 +183,34 @@
 
     const retryUrl = new URL('quiz.html', location.href);
     retryUrl.searchParams.set('level', level);
+    retryUrl.searchParams.set('stage', String(stage));
     retryUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('tryAgainLink').href = retryUrl.toString();
+
+    const stagesUrl = new URL('stages.html', location.href);
+    stagesUrl.searchParams.set('level', level);
+    stagesUrl.searchParams.set('v', WEB_VERSION);
+    document.getElementById('stagesLink').href = stagesUrl.toString();
 
     const homeUrl = new URL('index.html', location.href);
     homeUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('homeLink').href = homeUrl.toString();
 
-    // In the app WebView, notify Flutter once per quiz completion
-    // so it can show an interstitial ad after the 10-question run.
+    if (stage < totalStages) {
+      const nextUrl = new URL('quiz.html', location.href);
+      nextUrl.searchParams.set('level', level);
+      nextUrl.searchParams.set('stage', String(stage + 1));
+      nextUrl.searchParams.set('v', WEB_VERSION);
+      const nextLink = document.getElementById('nextStageLink');
+      nextLink.href = nextUrl.toString();
+      nextLink.style.display = 'block';
+    }
+
+    // 앱 WebView: 스테이지(10문제) 완료마다 알림 → Flutter에서 2회마다 전면광고
     window.setTimeout(() => {
       notifyApp('quizCompleted', {
         level,
+        stage,
         score,
         correct,
       });
