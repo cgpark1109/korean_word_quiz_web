@@ -22,18 +22,19 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
-      justify-content: space-between;
+      justify-content: flex-start;
     }
     .quiz-center {
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 14px;
-      padding: 4px 0 12px;
+      justify-content: flex-start;
+      gap: clamp(8px, 1.6vh, 14px);
+      padding: clamp(2px, 1vh, 10px) 0 10px;
     }
     .quiz-bottom {
       flex-shrink: 0;
+      margin-top: auto;
       padding-bottom: 12px;
     }
     .top-bar {
@@ -80,9 +81,9 @@
     }
     .question-card {
       margin: 0 20px;
-      padding: 28px 20px;
+      padding: clamp(18px, 3vh, 28px) 20px;
       text-align: center;
-      min-height: 140px;
+      min-height: clamp(110px, 19vh, 140px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -121,14 +122,14 @@
       background: var(--card-bg);
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 16px 10px;
+      padding: clamp(12px, 1.8vh, 16px) 10px;
       font-size: 15px;
       font-weight: 600;
       color: var(--text-primary);
       cursor: pointer;
       text-align: center;
       transition: background 0.2s, border-color 0.2s, color 0.2s;
-      min-height: 60px;
+      min-height: clamp(52px, 8vh, 60px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -202,7 +203,7 @@
     .dir-toggle-wrap {
       display: flex;
       gap: 8px;
-      padding: 0 20px 14px;
+      padding: 0 20px clamp(8px, 1.8vh, 14px);
     }
     .dir-btn {
       flex: 1;
@@ -222,6 +223,21 @@
       background: var(--gold);
       border-color: var(--gold);
       color: #fff;
+    }
+
+    @media (max-height: 760px) {
+      .top-bar {
+        padding-top: 12px;
+      }
+      .progress-bar-wrap {
+        padding-bottom: 10px;
+      }
+      .question-word {
+        font-size: 26px;
+      }
+      .question-word.small {
+        font-size: 20px;
+      }
     }
 
     @media (min-width: 520px) {
