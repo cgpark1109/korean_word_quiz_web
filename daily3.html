@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Daily 3 Redirect</title>
+  <link rel="stylesheet" href="./css/base.css?v=20260603-3">
+  <style>
+    body {
+      display: flex;
+      min-height: 100dvh;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div>Starting Daily 3...</div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const levelFromQuery = params.get('level');
+    const levelFromStorage = localStorage.getItem('home_daily_level');
+    const level = levelFromQuery || levelFromStorage || 'beginner';
+    const webVersion = params.get('v') || '20260603-3';
+
+    sessionStorage.setItem('force_daily_quiz', '1');
+    const target = new URL('quiz.html', location.href);
+    target.searchParams.set('level', level);
+    target.searchParams.set('mode', 'daily');
+    target.searchParams.set('daily', '1');
+    target.searchParams.set('count', '3');
+    target.searchParams.set('source', 'home');
+    target.searchParams.set('v', webVersion);
+    location.replace(target.toString());
+  </script>
+</body>
+</html>

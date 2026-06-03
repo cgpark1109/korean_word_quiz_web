@@ -80,7 +80,7 @@
       color: var(--border);
     }
   </style>
-  <script src="./js/app.js?v=20260528-1"></script>
+  <script src="./js/app.js?v=20260603-5"></script>
 </head>
 <body>
   <div class="top-bar">
@@ -103,6 +103,30 @@
   </div>
 
   <div class="section" style="margin-top:16px;">
+    <div class="section-header">More Apps</div>
+    <div class="info-card">
+      <a class="link-row" id="moreAppsLink" href="more-apps.html" style="text-decoration:none;color:inherit;">
+        <span class="link-label">More from GGOOK's Studio</span>
+        <span class="link-arrow">›</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:16px;">
+    <div class="section-header">Support</div>
+    <div class="info-card">
+      <div class="link-row" onclick="shareWithFriend()">
+        <span class="link-label">Share with Friends</span>
+        <span class="link-arrow">›</span>
+      </div>
+      <div class="link-row" onclick="rateApp()">
+        <span class="link-label">Rate this App</span>
+        <span class="link-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:16px;">
     <div class="section-header">Legal</div>
     <div class="info-card">
       <div class="link-row" onclick="openPrivacy()">
@@ -115,12 +139,109 @@
   <script>
     const WEB_VERSION =
       new URLSearchParams(window.location.search).get('v') || '20260528-1';
+    const APP_PACKAGE_ID = 'com.kysystemstudio.hangulchallenge';
+    const APP_STORE_URL = `https://play.google.com/store/apps/details?id=${APP_PACKAGE_ID}`;
+    const SHARE_URL = APP_STORE_URL;
+    const SHARE_TEXT_EN =
+      'I am using Korean Word Quiz to study Korean vocabulary. Try it out!';
 
     const backLink = document.querySelector('.back-btn');
     if (backLink) {
       const backUrl = new URL('index.html', location.href);
       backUrl.searchParams.set('v', WEB_VERSION);
       backLink.href = backUrl.toString();
+    }
+
+    const moreAppsLink = document.getElementById('moreAppsLink');
+    if (moreAppsLink) {
+      moreAppsLink.href = buildMoreAppsUrl(WEB_VERSION);
+    }
+
+    function fallbackCopyText(text) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, ta.value.length);
+        const copied = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return copied;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function copyText(text) {
+      try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch (e) {}
+      return fallbackCopyText(text);
+    }
+
+    async function copyShareMessage() {
+      const textToCopy = `${SHARE_TEXT_EN}\n${SHARE_URL}`;
+      const copied = await copyText(textToCopy);
+      if (copied) {
+        trackEvent('share_copy_fallback');
+        alert('Share message copied. Paste it and send to your friends.');
+      } else {
+        alert(`Copy and share this link:\n${SHARE_URL}`);
+      }
+    }
+
+    async function copyStoreLinkOnly() {
+      const copied = await copyText(APP_STORE_URL);
+      if (copied) {
+        alert('Store link copied. Open it in your browser.');
+      } else {
+        alert(`Open this store link in your browser:\n${APP_STORE_URL}`);
+      }
+    }
+
+    async function shareWithFriend() {
+      trackEvent('share_clicked');
+      const shareMessage = `${SHARE_TEXT_EN}\n${SHARE_URL}`;
+      const inAppWebView =
+        typeof window.flutter_inappwebview !== 'undefined' &&
+        typeof window.flutter_inappwebview.callHandler === 'function';
+
+      if (inAppWebView) {
+        const shared = await notifyApp('shareApp', { text: shareMessage });
+        if (shared?.ok) {
+          trackEvent('share_completed');
+          return;
+        }
+      }
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Korean Word Quiz',
+            text: SHARE_TEXT_EN,
+            url: SHARE_URL,
+          });
+          trackEvent('share_completed');
+          return;
+        } catch (e) {
+          // Use fallback when the share sheet is dismissed/cancelled.
+        }
+      }
+      await copyShareMessage();
+    }
+
+    async function rateApp() {
+      trackEvent('rate_clicked');
+      const opened = await notifyApp('openExternal', { url: APP_STORE_URL });
+      if (!opened?.ok) {
+        await copyStoreLinkOnly();
+      }
     }
 
     function openPrivacy() {

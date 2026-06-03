@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Result – Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260528-1">
+  <link rel="stylesheet" href="./css/base.css?v=20260603-2">
   <style>
     @keyframes popIn {
       0% { transform: scale(0.3); opacity: 0; }
@@ -62,6 +62,16 @@
       text-align: center;
       margin-top: -12px;
     }
+    .retention-note {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
 
     .stats-card {
       width: 100%;
@@ -101,7 +111,7 @@
       gap: 10px;
     }
   </style>
-  <script src="./js/app.js?v=20260528-1"></script>
+  <script src="./js/app.js?v=20260603-5"></script>
 </head>
 <body class="result-page">
   <div class="result-wrap">
@@ -111,6 +121,7 @@
       <div class="result-title" id="resultTitle">Stage Complete! 🎉</div>
       <div class="result-subtitle" id="resultSubtitle"></div>
     </div>
+    <div class="retention-note" id="retentionNote">Come back tomorrow for a quick 3-question session.</div>
 
     <div class="card stats-card">
       <div class="stat-item">
@@ -128,6 +139,8 @@
     </div>
 
     <div class="action-btns">
+      <a class="btn-primary" id="reviewLink" href="#" style="display:none;">Start Review →</a>
+      <a class="btn-secondary" id="dailyLink" href="#">Daily 3 Questions</a>
       <a class="btn-primary" id="nextStageLink" href="#" style="display:none;">Next Stage →</a>
       <a class="btn-primary" id="tryAgainLink" href="#">Try Again</a>
       <a class="btn-secondary" id="stagesLink" href="#">All Stages</a>
@@ -137,35 +150,51 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260528-1';
+      new URLSearchParams(window.location.search).get('v') || '20260603-5';
     const params = new URLSearchParams(location.search);
-    const level = params.get('level') || 'beginner';
+    const level = normalizeStageLevel(params.get('level')) || resolveStageLevel();
+    const mode = params.get('mode') || 'stage';
     const stage = parseInt(params.get('stage') || '1', 10);
     const totalStages = parseInt(params.get('totalStages') || '1', 10);
     const score = parseInt(params.get('score') || '0', 10);
     const correct = parseInt(params.get('correct') || '0', 10);
-    const QUESTIONS_PER_STAGE = 10;
+    const totalQuestions = parseInt(params.get('totalQuestions') || '10', 10);
+    const streakCurrent = parseInt(params.get('streakCurrent') || '0', 10);
 
     const levelIcons = { beginner: '🌱', intermediate: '🌿', advanced: '🌳', expert: '⭐' };
     const levelNames = {
-      beginner: '입문',
-      intermediate: '중급',
-      advanced: '고급',
-      expert: '특급',
+      beginner: 'Beginner',
+      intermediate: 'Intermediate',
+      advanced: 'Advanced',
+      expert: 'Expert',
     };
 
-    localStorage.setItem(`stage_cleared_${level}_${stage}`, 'true');
+    trackEvent('quiz_completed');
+    if (mode === 'stage') {
+      localStorage.setItem(`stage_cleared_${level}_${stage}`, 'true');
+    }
 
-    document.getElementById('resultSubtitle').textContent =
-      `${levelNames[level] || level} · Stage ${stage} of ${totalStages}`;
+    const resultSubtitle =
+      mode === 'review'
+        ? `${levelNames[level] || level} · Review Session Complete`
+        : mode === 'daily'
+          ? `${levelNames[level] || level} · Daily Session Complete`
+          : `${levelNames[level] || level} · Stage ${stage} of ${totalStages}`;
+    document.getElementById('resultSubtitle').textContent = resultSubtitle;
     document.getElementById('statScore').textContent = score;
-    document.getElementById('statCorrect').textContent = `${correct}/${QUESTIONS_PER_STAGE}`;
-    document.getElementById('statLevel').textContent = stage;
+    document.getElementById('statCorrect').textContent = `${correct}/${totalQuestions}`;
+    document.getElementById('statLevel').textContent = mode === 'stage' ? stage : '—';
+
+    const retentionNote = document.getElementById('retentionNote');
+    if (streakCurrent > 0) {
+      retentionNote.textContent = `You are on a ${streakCurrent}-day streak. Keep it going tomorrow!`;
+    }
 
     const starsRow = document.getElementById('starsRow');
+    const ratio = totalQuestions > 0 ? correct / totalQuestions : 0;
     let filledStars = 1;
-    if (correct >= 8) filledStars = 3;
-    else if (correct >= 5) filledStars = 2;
+    if (ratio >= 0.8) filledStars = 3;
+    else if (ratio >= 0.5) filledStars = 2;
 
     for (let i = 0; i < 3; i++) {
       const star = document.createElement('span');
@@ -183,9 +212,22 @@
 
     const retryUrl = new URL('quiz.html', location.href);
     retryUrl.searchParams.set('level', level);
-    retryUrl.searchParams.set('stage', String(stage));
+    retryUrl.searchParams.set('mode', mode);
+    if (mode === 'stage') {
+      retryUrl.searchParams.set('stage', String(stage));
+    } else if (mode === 'daily') {
+      retryUrl.searchParams.set('count', '3');
+    } else if (mode === 'review') {
+      retryUrl.searchParams.set('count', String(Math.max(1, Math.min(5, getReviewWordIds(level).length))));
+    }
     retryUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('tryAgainLink').href = retryUrl.toString();
+
+    document.getElementById('dailyLink').href = buildDailyQuizUrl(level, WEB_VERSION);
+    document.getElementById('dailyLink').addEventListener('click', (event) => {
+      event.preventDefault();
+      startDailyQuiz(level, WEB_VERSION);
+    });
 
     const stagesUrl = new URL('stages.html', location.href);
     stagesUrl.searchParams.set('level', level);
@@ -196,7 +238,19 @@
     homeUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('homeLink').href = homeUrl.toString();
 
-    if (stage < totalStages) {
+    const reviewIds = getReviewWordIds(level);
+    if (reviewIds.length) {
+      const reviewUrl = new URL('quiz.html', location.href);
+      reviewUrl.searchParams.set('level', level);
+      reviewUrl.searchParams.set('mode', 'review');
+      reviewUrl.searchParams.set('count', String(Math.min(5, reviewIds.length)));
+      reviewUrl.searchParams.set('v', WEB_VERSION);
+      const reviewLink = document.getElementById('reviewLink');
+      reviewLink.href = reviewUrl.toString();
+      reviewLink.style.display = 'block';
+    }
+
+    if (mode === 'stage' && stage < totalStages) {
       const nextUrl = new URL('quiz.html', location.href);
       nextUrl.searchParams.set('level', level);
       nextUrl.searchParams.set('stage', String(stage + 1));
@@ -206,7 +260,7 @@
       nextLink.style.display = 'block';
     }
 
-    // 앱 WebView: 스테이지(10문제) 완료마다 알림 → Flutter에서 2회마다 전면광고
+    // Notify app after each stage completion (used for interstitial pacing).
     window.setTimeout(() => {
       notifyApp('quizCompleted', {
         level,

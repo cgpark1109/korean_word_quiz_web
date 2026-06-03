@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>More Apps – Korean Word Quiz</title>
+  <link rel="stylesheet" href="./css/base.css?v=20260603-5">
+  <style>
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px 8px;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      text-decoration: none;
+    }
+    .page-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .page-intro {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      padding: 4px 20px 16px;
+    }
+    .app-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 20px 24px;
+    }
+    .app-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card-bg);
+      cursor: pointer;
+      text-align: left;
+    }
+    .app-card:active {
+      transform: scale(0.99);
+    }
+    .app-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .app-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .app-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .app-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+    .app-arrow {
+      font-size: 18px;
+      color: var(--border);
+      flex-shrink: 0;
+    }
+    .empty-text {
+      margin: 8px 20px 24px;
+      padding: 20px 16px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.6;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card-bg);
+    }
+    .developer-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 0 20px 20px;
+      line-height: 1.5;
+    }
+  </style>
+  <script src="./js/app.js?v=20260603-5"></script>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="back-btn" id="backBtn" href="index.html">←</a>
+    <div class="page-title" id="pageTitle">More Apps</div>
+  </div>
+  <p class="page-intro" id="pageIntro"></p>
+
+  <div class="app-list" id="appList"></div>
+  <div class="empty-text" id="emptyText" style="display:none;">No other apps listed yet.</div>
+  <p class="developer-note">Developer promotion · Not a Google ad</p>
+
+  <script>
+    const WEB_VERSION =
+      new URLSearchParams(window.location.search).get('v') || '20260603-5';
+    const CURRENT_PACKAGE_ID = 'com.kysystemstudio.hangulchallenge';
+
+    const backUrl = new URL('index.html', location.href);
+    backUrl.searchParams.set('v', WEB_VERSION);
+    document.getElementById('backBtn').href = backUrl.toString();
+
+    function renderAppCard(app) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'app-card';
+      btn.innerHTML = `
+        <span class="app-icon">${app.icon || '📱'}</span>
+        <span class="app-info">
+          <div class="app-name">${app.name || 'App'}</div>
+          <div class="app-sub">${app.subtitle || ''}</div>
+        </span>
+        <span class="app-arrow">›</span>
+      `;
+      btn.addEventListener('click', () => openListedApp(app));
+      return btn;
+    }
+
+    async function openListedApp(app) {
+      if (!app?.packageId) return;
+      trackEvent('more_app_opened');
+      await openPlayStoreUrl(buildPlayStoreUrl(app.packageId));
+    }
+
+    async function loadMoreAppsPage() {
+      try {
+        const res = await fetch('./more-apps.json?v=' + encodeURIComponent(WEB_VERSION));
+        const data = await res.json();
+        const studioName = data.studioName || "GGOOK's Studio";
+        document.getElementById('pageTitle').textContent = studioName;
+        document.getElementById('pageIntro').textContent =
+          data.intro || 'Check out our other apps on Google Play.';
+
+        const apps = (Array.isArray(data.apps) ? data.apps : []).filter(
+          app =>
+            app &&
+            app.active !== false &&
+            app.packageId &&
+            app.packageId !== CURRENT_PACKAGE_ID
+        );
+
+        const list = document.getElementById('appList');
+        const empty = document.getElementById('emptyText');
+        list.innerHTML = '';
+
+        if (!apps.length) {
+          empty.style.display = 'block';
+          return;
+        }
+
+        empty.style.display = 'none';
+        apps.forEach(app => list.appendChild(renderAppCard(app)));
+      } catch (e) {
+        document.getElementById('emptyText').textContent = 'Failed to load app list.';
+        document.getElementById('emptyText').style.display = 'block';
+      }
+    }
+
+    loadMoreAppsPage();
+  </script>
+</body>
+</html>

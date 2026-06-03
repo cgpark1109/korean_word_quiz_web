@@ -1,245 +1,550 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260528-1">
-  <style>
-    .header {
-      padding: 40px 24px 24px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .header-decoration {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .deco-word {
-      position: absolute;
-      font-size: 48px;
-      font-weight: 700;
-      color: var(--text-primary);
-      opacity: 0.08;
-      white-space: nowrap;
-    }
-    .app-title {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--text-primary);
-      position: relative;
-      z-index: 1;
-    }
-    .app-subtitle {
-      font-size: 14px;
-      color: var(--gold);
-      margin-top: 6px;
-      position: relative;
-      z-index: 1;
-    }
-    .section-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0 20px 10px;
-    }
-    .level-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 0 20px;
-    }
-    .level-card {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      height: 80px;
-      padding: 0 20px;
-      cursor: pointer;
-      border: none;
-      text-align: left;
-      width: 100%;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      transition: transform 0.1s, box-shadow 0.1s;
-    }
-    .level-card:active {
-      transform: scale(0.98);
-    }
-    .level-icon {
-      font-size: 28px;
-      flex-shrink: 0;
-    }
-    .level-info {
-      flex: 1;
-    }
-    .level-name {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .level-sub {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-    .level-arrow {
-      font-size: 18px;
-      color: var(--border);
-    }
-    .footer-btn {
-      padding: 20px 20px 0;
-    }
-    .settings-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: transparent;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-      font-size: 15px;
-      color: var(--text-secondary);
-      cursor: pointer;
-      width: 100%;
-    }
-
-    @media (min-width: 520px) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Korean Word Quiz</title>
+    <link rel="stylesheet" href="./css/base.css?v=20260603-2" />
+    <style>
       .header {
-        padding: 48px 32px 28px;
+        padding: 6px 20px 14px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
       }
-      .app-title {
-        font-size: 32px;
+      .header-toolbar {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 40px 1fr 40px;
+        align-items: center;
+        gap: 8px;
       }
-      .app-subtitle {
-        font-size: 16px;
+      .header-title-wrap {
+        min-width: 0;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        padding-top: 1.25rem;
+      }
+      .header-icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1.5px solid var(--border);
+        background: var(--card-bg);
+        font-size: 20px;
+        line-height: 1;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          transform 0.1s,
+          background 0.15s;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .header-icon-btn:active {
+        transform: scale(0.94);
+        background: var(--bg);
+      }
+      .notice-popup-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+        background: rgba(45, 32, 18, 0.45);
+      }
+      .notice-popup-card {
+        width: 100%;
+        max-width: 320px;
+        padding: 24px 22px 20px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        text-align: center;
+        box-shadow: 0 12px 32px rgba(61, 43, 26, 0.18);
+      }
+      .notice-popup-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 6px;
+      }
+      .notice-popup-date {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin: 0 0 12px;
+      }
+      .notice-popup-message {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin: 0 0 20px;
+        white-space: pre-line;
+        text-align: left;
+      }
+      .notice-popup-btn {
+        width: 100%;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: var(--gold);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        padding: 12px 16px;
+        cursor: pointer;
+      }
+      .notice-popup-btn:active {
+        opacity: 0.9;
+      }
+      .header-decoration {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
       }
       .deco-word {
-        font-size: 56px;
+        position: absolute;
+        font-size: 48px;
+        font-weight: 700;
+        color: var(--text-primary);
+        opacity: 0.08;
+        white-space: nowrap;
+      }
+      .app-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.1;
+      }
+      .app-subtitle {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-top: 6px;
+        line-height: 1.35;
+        letter-spacing: 0.01em;
       }
       .section-label {
-        font-size: 15px;
-        padding: 0 28px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0 20px 10px;
       }
       .level-list {
-        gap: 14px;
-        padding: 0 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 0 20px 12px;
+      }
+      .studio-promo-wrap {
+        padding: 4px 20px 12px;
+        margin-bottom: 4px;
+      }
+      .studio-promo-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--card-bg);
+        text-decoration: none;
+        color: inherit;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .studio-promo-link:active {
+        background: var(--bg);
+      }
+      .studio-promo-badge {
+        flex-shrink: 0;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 4px 6px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+      }
+      .studio-promo-text {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        line-height: 1.3;
+      }
+      .studio-promo-arrow {
+        font-size: 18px;
+        color: var(--border);
+        flex-shrink: 0;
       }
       .level-card {
-        height: 96px;
-        padding: 0 24px;
-        gap: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 80px;
+        padding: 0 20px;
+        cursor: pointer;
+        border: none;
+        text-align: left;
+        width: 100%;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        transition:
+          transform 0.1s,
+          box-shadow 0.1s;
+      }
+      .level-card:active {
+        transform: scale(0.98);
       }
       .level-icon {
-        font-size: 36px;
+        font-size: 28px;
+        flex-shrink: 0;
+      }
+      .level-info {
+        flex: 1;
       }
       .level-name {
-        font-size: 20px;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--text-primary);
       }
       .level-sub {
-        font-size: 15px;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 2px;
       }
-      .footer-btn {
-        padding: 24px 28px 0;
+      .level-arrow {
+        font-size: 18px;
+        color: var(--border);
       }
-      .settings-btn {
-        font-size: 17px;
-        padding: 16px;
+      .mission-wrap {
+        padding: 0 20px 14px;
+        margin-bottom: 4px;
       }
-    }
-  </style>
-  <script src="./js/app.js?v=20260528-1"></script>
-</head>
-<body>
-  <div class="header">
-    <div class="header-decoration">
-      <span class="deco-word" style="top:10px;left:-10px;">사과</span>
-      <span class="deco-word" style="top:0px;right:-5px;font-size:36px;">학교</span>
-      <span class="deco-word" style="bottom:0px;left:20px;font-size:40px;">친구</span>
-      <span class="deco-word" style="bottom:5px;right:10px;font-size:32px;">하늘</span>
+      .mission-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card-bg);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .mission-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .mission-meta {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .mission-row {
+        display: flex;
+        gap: 8px;
+      }
+      .mission-btn {
+        flex: 1;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 600;
+        padding: 10px 8px;
+        cursor: pointer;
+      }
+      .mission-btn.primary {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: #fff;
+      }
+      @media (min-width: 520px) {
+        .header {
+          padding: 10px 28px 16px;
+        }
+        .header-toolbar {
+          grid-template-columns: 44px 1fr 44px;
+          gap: 12px;
+        }
+        .header-title-wrap {
+          padding-top: 1.35rem;
+        }
+        .header-icon-btn {
+          width: 44px;
+          height: 44px;
+          font-size: 22px;
+        }
+        .app-title {
+          font-size: 30px;
+        }
+        .app-subtitle {
+          font-size: 15px;
+        }
+        .deco-word {
+          font-size: 56px;
+        }
+        .section-label {
+          font-size: 15px;
+          padding: 0 28px 12px;
+        }
+        .level-list {
+          gap: 14px;
+          padding: 0 28px;
+        }
+        .level-card {
+          height: 96px;
+          padding: 0 24px;
+          gap: 20px;
+        }
+        .level-icon {
+          font-size: 36px;
+        }
+        .level-name {
+          font-size: 20px;
+        }
+        .level-sub {
+          font-size: 15px;
+        }
+        .level-list {
+          padding-bottom: 12px;
+        }
+        .studio-promo-wrap {
+          padding: 4px 28px 16px;
+        }
+      }
+    </style>
+    <script src="./js/app.js?v=20260603-5"></script>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-decoration">
+        <span class="deco-word" style="top: 10px; left: -10px">apple</span>
+        <span class="deco-word" style="top: 0px; right: -5px; font-size: 36px"
+          >school</span
+        >
+        <span class="deco-word" style="bottom: 0px; left: 20px; font-size: 40px"
+          >friend</span
+        >
+        <span
+          class="deco-word"
+          style="bottom: 5px; right: 10px; font-size: 32px"
+          >sky</span
+        >
+      </div>
+      <div class="header-toolbar">
+        <a
+          href="notice.html"
+          class="header-icon-btn"
+          id="noticeLink"
+          aria-label="Notice"
+          title="Notice"
+          >📢</a
+        >
+        <div class="header-title-wrap">
+          <div class="app-title">Korean Word<br>Quiz</div>
+          <div class="app-subtitle">Learn Korean Vocabulary</div>
+        </div>
+        <a
+          href="settings.html"
+          class="header-icon-btn"
+          id="settingsLink"
+          aria-label="Settings"
+          title="Settings"
+          >⚙️</a
+        >
+      </div>
     </div>
-    <div class="app-title">Korean Word Quiz</div>
-    <div class="app-subtitle">한국어 단어 퀴즈</div>
-  </div>
 
-  <div class="section-label">Choose Level</div>
-
-  <div class="level-list">
-    <button class="level-card" type="button" data-level="beginner">
-      <span class="level-icon">🌱</span>
-      <div class="level-info">
-        <div class="level-name">입문 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Beginner</span></div>
-        <div class="level-sub">70 words · 7 stages × 10 questions</div>
+    <div class="mission-wrap">
+      <div class="mission-card">
+        <div class="mission-title">Daily Mission</div>
+        <div class="mission-meta" id="attendanceMeta">
+          Check in and solve your daily 3 words.
+        </div>
+        <div class="mission-row">
+          <button class="mission-btn" type="button" id="attendanceBtn">
+            Attendance Check
+          </button>
+          <a
+            class="mission-btn primary"
+            id="dailyThreeBtn"
+            href="quiz.html?level=beginner&mode=daily&daily=1&count=3&source=home"
+            style="
+              text-decoration: none;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+            >Daily 3 Words</a
+          >
+        </div>
       </div>
-      <span class="level-arrow">›</span>
-    </button>
+    </div>
 
-    <button class="level-card" type="button" data-level="intermediate">
-      <span class="level-icon">🌿</span>
-      <div class="level-info">
-        <div class="level-name">중급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Intermediate</span></div>
-        <div class="level-sub">50 words · 5 stages × 10 questions</div>
-      </div>
-      <span class="level-arrow">›</span>
-    </button>
+    <div class="section-label">Choose Level</div>
 
-    <button class="level-card" type="button" data-level="advanced">
-      <span class="level-icon">🌳</span>
-      <div class="level-info">
-        <div class="level-name">고급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Advanced</span></div>
-        <div class="level-sub">50 proverbs · 5 stages × 10 questions</div>
-      </div>
-      <span class="level-arrow">›</span>
-    </button>
+    <div class="level-list">
+      <button class="level-card" type="button" data-level="beginner">
+        <span class="level-icon">🌱</span>
+        <div class="level-info">
+          <div class="level-name">Beginner</div>
+          <div class="level-sub">70 words · 7 stages × 10 questions</div>
+        </div>
+        <span class="level-arrow">›</span>
+      </button>
 
-    <button class="level-card" type="button" data-level="expert">
-      <span class="level-icon">⭐</span>
-      <div class="level-info">
-        <div class="level-name">특급 <span style="font-size:13px;font-weight:400;color:var(--text-muted);">Expert</span></div>
-        <div class="level-sub">40 words · 4 stages × 10 questions</div>
-      </div>
-      <span class="level-arrow">›</span>
-    </button>
-  </div>
+      <button class="level-card" type="button" data-level="intermediate">
+        <span class="level-icon">🌿</span>
+        <div class="level-info">
+          <div class="level-name">Intermediate</div>
+          <div class="level-sub">50 words · 5 stages × 10 questions</div>
+        </div>
+        <span class="level-arrow">›</span>
+      </button>
 
-  <div class="footer-btn">
-    <a href="settings.html" class="btn-secondary settings-btn" style="text-decoration:none;">
-      ⚙️ Settings
-    </a>
-  </div>
+      <button class="level-card" type="button" data-level="advanced">
+        <span class="level-icon">🌳</span>
+        <div class="level-info">
+          <div class="level-name">Advanced</div>
+          <div class="level-sub">50 proverbs · 5 stages × 10 questions</div>
+        </div>
+        <span class="level-arrow">›</span>
+      </button>
 
-  <script>
-    const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260528-1';
+      <button class="level-card" type="button" data-level="expert">
+        <span class="level-icon">⭐</span>
+        <div class="level-info">
+          <div class="level-name">Expert</div>
+          <div class="level-sub">40 words · 4 stages × 10 questions</div>
+        </div>
+        <span class="level-arrow">›</span>
+      </button>
+    </div>
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadNotice();
+    <div class="studio-promo-wrap">
+      <a class="studio-promo-link" id="moreAppsLink" href="more-apps.html">
+        <span class="studio-promo-badge">Developer</span>
+        <span class="studio-promo-text">More apps from GGOOK's Studio</span>
+        <span class="studio-promo-arrow">›</span>
+      </a>
+    </div>
 
-      const settingsLink = document.querySelector('.settings-btn');
-      if (settingsLink) {
-        const settingsUrl = new URL('settings.html', location.href);
-        settingsUrl.searchParams.set('v', WEB_VERSION);
-        settingsLink.href = settingsUrl.toString();
-      }
+    <script>
+      const WEB_VERSION =
+        new URLSearchParams(window.location.search).get("v") || "20260603-5";
 
-      document.querySelectorAll('.level-card[data-level]').forEach(card => {
-        card.addEventListener('click', () => {
-          const level = card.dataset.level;
-          if (!level) return;
-          const nextUrl = new URL('stages.html', location.href);
-          nextUrl.searchParams.set('level', level);
-          nextUrl.searchParams.set('v', WEB_VERSION);
-          location.href = nextUrl.toString();
+      document.addEventListener("DOMContentLoaded", () => {
+        loadNotice();
+        if (localStorage.getItem("first_open_tracked") !== "true") {
+          trackEvent("first_open");
+        }
+
+        const attendanceMeta = document.getElementById("attendanceMeta");
+        const attendanceBtn = document.getElementById("attendanceBtn");
+        const dailyThreeBtn = document.getElementById("dailyThreeBtn");
+
+        function formatDayCount(count) {
+          return `${count} ${count === 1 ? "day" : "days"}`;
+        }
+
+        function renderAttendanceStatus() {
+          const status = getAttendanceStatus();
+          const today = getLocalDateKey();
+          const checkedToday = status.lastDate === today;
+          attendanceMeta.textContent = checkedToday
+            ? `Checked in today · Streak ${formatDayCount(status.streak)} · Best ${status.best}`
+            : `Not checked in yet · Current streak ${formatDayCount(status.streak)}`;
+          attendanceBtn.textContent = checkedToday
+            ? "Checked Today"
+            : "Attendance Check";
+          attendanceBtn.disabled = checkedToday;
+          attendanceBtn.style.opacity = checkedToday ? "0.55" : "1";
+        }
+
+        attendanceBtn.addEventListener("click", () => {
+          const result = checkInToday();
+          if (!result.alreadyChecked) {
+            alert(`Check-in complete! Current streak: ${formatDayCount(result.streak)}`);
+          }
+          renderAttendanceStatus();
+        });
+
+        function syncDailyThreeLink() {
+          const preferredLevel =
+            localStorage.getItem("home_daily_level") || "beginner";
+          dailyThreeBtn.href = buildDailyQuizUrl(preferredLevel, WEB_VERSION);
+        }
+
+        dailyThreeBtn.addEventListener("click", (event) => {
+          event.preventDefault();
+          trackEvent("daily3_started");
+          startDailyQuiz(
+            localStorage.getItem("home_daily_level") || "beginner",
+            WEB_VERSION,
+          );
+        });
+
+        syncDailyThreeLink();
+
+        renderAttendanceStatus();
+
+        const settingsLink = document.getElementById("settingsLink");
+        if (settingsLink) {
+          const settingsUrl = new URL("settings.html", location.href);
+          settingsUrl.searchParams.set("v", WEB_VERSION);
+          settingsLink.href = settingsUrl.toString();
+        }
+
+        const noticeLink = document.getElementById("noticeLink");
+        if (noticeLink) {
+          const noticeUrl = new URL("notice.html", location.href);
+          noticeUrl.searchParams.set("v", WEB_VERSION);
+          noticeLink.href = noticeUrl.toString();
+        }
+
+        const moreAppsLink = document.getElementById("moreAppsLink");
+        if (moreAppsLink) {
+          moreAppsLink.href = buildMoreAppsUrl(WEB_VERSION);
+          moreAppsLink.addEventListener("click", () =>
+            trackEvent("more_apps_opened"),
+          );
+        }
+
+        document.querySelectorAll(".level-card[data-level]").forEach((card) => {
+          card.addEventListener("click", () => {
+            const level = card.dataset.level;
+            if (!level) return;
+            sessionStorage.removeItem("force_daily_quiz");
+            rememberStageLevel(level);
+            const nextUrl = new URL("stages.html", location.href);
+            nextUrl.searchParams.set("level", level);
+            nextUrl.searchParams.set("v", WEB_VERSION);
+            location.href = nextUrl.toString();
+          });
         });
       });
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

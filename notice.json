@@ -1,4 +1,23 @@
 {
   "popup": { "active": false, "title": "", "message": "", "button": "OK", "version": "1.0" },
-  "banner": { "active": false, "message": "" }
+  "banner": { "active": false, "message": "" },
+  "notices": [
+    {
+      "id": "2026-06-daily",
+      "revision": 1,
+      "active": true,
+      "title": "New Daily 3",
+      "message": "Start a quick 3-question session and keep your streak alive.",
+      "date": "2026-06-03",
+      "button": "OK"
+    },
+    {
+      "id": "2026-06-retention",
+      "revision": 1,
+      "active": true,
+      "title": "Review Mode Added",
+      "message": "Wrong answers are now saved automatically so you can review them later.",
+      "date": "2026-06-02"
+    }
+  ]
 }

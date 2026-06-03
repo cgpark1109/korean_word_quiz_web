@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Quiz – Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260528-1">
+  <link rel="stylesheet" href="./css/base.css?v=20260603-2">
   <style>
     body.quiz-page {
       display: flex;
@@ -110,8 +110,38 @@
       color: var(--text-muted);
       font-style: italic;
     }
+    .hint-reward-wrap {
+      margin: 0 20px;
+      display: none;
+    }
+    .hint-reward-btn {
+      width: 100%;
+      border: 1.5px dashed var(--gold);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+    .hint-reward-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .hint-reward-panel {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      text-align: left;
+    }
 
-    /* 4지선다 그리드 */
+    /* Multiple-choice grid */
     .choices-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -149,7 +179,7 @@
       cursor: default;
     }
 
-    /* 피드백 */
+    /* Feedback */
     .feedback-box {
       margin: 16px 20px 0;
       padding: 14px 16px;
@@ -190,39 +220,13 @@
       display: block;
     }
 
-    /* expert 레벨: 단어 설명 카드 */
+    /* Expert-level hint card */
     .expert-usage-label {
       font-size: 11px;
       color: var(--text-muted);
       background: var(--bg);
       border-radius: 4px;
       padding: 2px 8px;
-    }
-
-    /* 방향 선택 토글 (입문·중급 전용) */
-    .dir-toggle-wrap {
-      display: flex;
-      gap: 8px;
-      padding: 0 20px clamp(8px, 1.8vh, 14px);
-    }
-    .dir-btn {
-      flex: 1;
-      padding: 9px 8px;
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: var(--radius-sm);
-      border: 1.5px solid var(--border);
-      background: var(--card-bg);
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: background 0.18s, border-color 0.18s, color 0.18s;
-      text-align: center;
-      line-height: 1.3;
-    }
-    .dir-btn.active {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: #fff;
     }
 
     @media (max-height: 760px) {
@@ -252,14 +256,9 @@
         min-height: 72px;
         padding: 18px 12px;
       }
-      .dir-btn {
-        font-size: 15px;
-        padding: 12px 10px;
-      }
       .top-bar,
       .progress-bar-wrap,
-      .choices-grid,
-      .dir-toggle-wrap {
+      .choices-grid {
         padding-left: 28px;
         padding-right: 28px;
       }
@@ -270,7 +269,7 @@
       }
     }
   </style>
-  <script src="./js/app.js?v=20260528-1"></script>
+  <script src="./js/app.js?v=20260603-5"></script>
 </head>
 <body class="quiz-page">
   <header class="quiz-header">
@@ -289,15 +288,15 @@
 
   <main class="quiz-main">
     <div class="quiz-center">
-      <div class="dir-toggle-wrap" id="dirToggleWrap" style="display:none;">
-        <button class="dir-btn active" id="dirBtnKO">한글 → 영어</button>
-        <button class="dir-btn" id="dirBtnEN">영어 → 한글</button>
-      </div>
-
       <div class="card question-card">
         <div class="question-type-label" id="questionTypeLabel"></div>
         <div class="question-word" id="questionWord"></div>
         <div class="question-hint" id="questionSubHint"></div>
+      </div>
+
+      <div class="hint-reward-wrap" id="hintRewardWrap">
+        <button type="button" class="hint-reward-btn" id="hintRewardBtn">Watch ad for hint</button>
+        <div class="hint-reward-panel" id="hintRewardPanel" style="display:none;"></div>
       </div>
 
       <div class="choices-grid" id="choicesGrid"></div>
@@ -319,13 +318,30 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260528-1';
+      new URLSearchParams(window.location.search).get('v') || '20260603-5';
     const urlParams = new URLSearchParams(location.search);
-    const requestedLevel = urlParams.get('level') || 'beginner';
-    const supportedLevels = ['beginner', 'intermediate', 'advanced', 'expert'];
-    const level = supportedLevels.includes(requestedLevel)
-      ? requestedLevel
-      : 'beginner';
+    const requestedLevel = urlParams.get('level') || resolveStageLevel();
+    const requestedMode = (urlParams.get('mode') || 'stage').toLowerCase();
+    const dailyFlag = urlParams.get('daily') === '1';
+    const source = urlParams.get('source') || '';
+    const countParam = urlParams.get('count') || '';
+    const forceDailyFlag = sessionStorage.getItem('force_daily_quiz') === '1';
+    let mode = requestedMode;
+    if (
+      forceDailyFlag ||
+      dailyFlag ||
+      requestedMode === 'daily' ||
+      (source === 'home' && countParam === '3' && !urlParams.has('stage')) ||
+      (countParam === '3' && !urlParams.has('stage'))
+    ) {
+      mode = 'daily';
+      sessionStorage.removeItem('force_daily_quiz');
+    }
+    const requestedCount = parseInt(urlParams.get('count') || '0', 10);
+    const level = normalizeStageLevel(requestedLevel) || 'beginner';
+    if (mode !== 'daily') {
+      rememberStageLevel(level);
+    }
     const QUESTIONS_PER_STAGE = 10;
     const wordCounts = {
       beginner: 70,
@@ -337,7 +353,12 @@
     let stage = parseInt(urlParams.get('stage') || '1', 10);
     if (!Number.isFinite(stage) || stage < 1) stage = 1;
     if (stage > totalStages) stage = totalStages;
-    const TOTAL = QUESTIONS_PER_STAGE;
+    let TOTAL = QUESTIONS_PER_STAGE;
+    if (mode === 'daily') TOTAL = 3;
+    else if (mode === 'review' && Number.isFinite(requestedCount) && requestedCount > 0) {
+      TOTAL = Math.min(10, requestedCount);
+    }
+    document.getElementById('progressText').textContent = `1 / ${TOTAL}`;
 
     const levelIcons = {
       beginner: '🌱',
@@ -346,37 +367,42 @@
       expert: '⭐',
     };
     const levelNames = {
-      beginner: '입문',
-      intermediate: '중급',
-      advanced: '고급',
-      expert: '특급',
+      beginner: 'Beginner',
+      intermediate: 'Intermediate',
+      advanced: 'Advanced',
+      expert: 'Expert',
     };
 
-    const backUrl = new URL('stages.html', location.href);
-    backUrl.searchParams.set('level', level);
+    const backTarget = mode === 'daily' ? 'index.html' : 'stages.html';
+    const backUrl = new URL(backTarget, location.href);
+    if (mode !== 'daily') {
+      backUrl.searchParams.set('level', level);
+    }
     backUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('backBtn').href = backUrl.toString();
+    const modeLabel =
+      mode === 'review' ? 'Review' : mode === 'daily' ? 'Daily 3' : `Stage ${stage}`;
     document.getElementById('levelBadge').textContent =
-      `${levelIcons[level] || ''} ${levelNames[level] || level} · Stage ${stage}`.trim();
+      `${levelIcons[level] || ''} ${levelNames[level] || level} · ${modeLabel}`.trim();
 
     function showQuizError(message) {
       document.getElementById('choicesGrid').style.display = 'none';
       document.getElementById('questionTypeLabel').textContent =
-        '문제를 불러오지 못했습니다';
+        'Failed to load quiz';
       document.getElementById('questionWord').textContent = message;
       document.getElementById('questionWord').className = 'question-word small';
       document.getElementById('questionSubHint').textContent = '';
       document.getElementById('feedbackBox').className = 'feedback-box wrong show';
-      document.getElementById('feedbackTitle').textContent = '오류';
+      document.getElementById('feedbackTitle').textContent = 'Error';
       document.getElementById('feedbackHint').textContent =
-        '단어 데이터가 비어 있거나 로드되지 않았습니다.';
+        'Word data is empty or failed to load.';
       document.getElementById('nextBtnWrap').className = 'next-btn-wrap';
     }
 
     const script = document.createElement('script');
     script.src = `js/word-data-${level}.js?v=${encodeURIComponent(WEB_VERSION)}`;
     script.onload = () => initQuiz();
-    script.onerror = () => showQuizError('레벨 데이터 파일을 불러오지 못했습니다.');
+    script.onerror = () => showQuizError('Failed to load level data file.');
     document.head.appendChild(script);
 
     function initQuiz() {
@@ -384,50 +410,192 @@
       const pool = [...(wordData[level] || [])];
 
       if (!pool.length) {
-        showQuizError('선택한 레벨의 데이터가 없습니다.');
+        showQuizError('No data found for this level.');
         return;
       }
 
-      const startIdx = (stage - 1) * QUESTIONS_PER_STAGE;
-      const stageWords = pool.slice(startIdx, startIdx + QUESTIONS_PER_STAGE);
-      if (stageWords.length < TOTAL) {
-        showQuizError('이 스테이지에 문제가 충분하지 않습니다.');
+      function getWordId(word) {
+        if (!word || typeof word !== 'object') return '';
+        if (word.korean && word.english) return `${word.korean}__${word.english}`;
+        if (word.korean && word.answer) return `${word.korean}__${word.answer}`;
+        if (word.korean && Array.isArray(word.meanings)) return `${word.korean}__expert`;
+        return JSON.stringify(word);
+      }
+
+      function getDailyWords() {
+        let maxUnlockedStage = 1;
+        for (let n = 2; n <= totalStages; n++) {
+          if (localStorage.getItem(`stage_cleared_${level}_${n - 1}`) === 'true') {
+            maxUnlockedStage = n;
+          } else {
+            break;
+          }
+        }
+        const unlockedWordCount = Math.min(maxUnlockedStage * QUESTIONS_PER_STAGE, pool.length);
+        return pool.slice(0, unlockedWordCount);
+      }
+
+      function getDailyFixedWords() {
+        const dailyPool = getDailyWords();
+        const maxDailyCount = Math.min(TOTAL, dailyPool.length);
+        if (!maxDailyCount) return [];
+
+        const todayKey = getLocalDateKey();
+        const storageKey = `daily_word_ids_${level}_${todayKey}`;
+        const savedIds = getJsonStorage(storageKey, []);
+        const byId = new Map(dailyPool.map(word => [getWordId(word), word]));
+
+        if (Array.isArray(savedIds) && savedIds.length) {
+          const savedWords = savedIds
+            .map(id => byId.get(id))
+            .filter(Boolean)
+            .slice(0, maxDailyCount);
+          if (savedWords.length === maxDailyCount) return savedWords;
+        }
+
+        const selectedWords = shuffle([...dailyPool]).slice(0, maxDailyCount);
+        setJsonStorage(storageKey, selectedWords.map(getWordId));
+        return selectedWords;
+      }
+
+      let sourceWords = [];
+      if (mode === 'review') {
+        const reviewSet = new Set(getReviewWordIds(level));
+        sourceWords = pool.filter(w => reviewSet.has(getWordId(w)));
+      } else if (mode === 'daily') {
+        sourceWords = getDailyFixedWords();
+      } else {
+        const startIdx = (stage - 1) * QUESTIONS_PER_STAGE;
+        sourceWords = pool.slice(startIdx, startIdx + QUESTIONS_PER_STAGE);
+      }
+
+      if (!sourceWords.length) {
+        if (mode === 'review') {
+          showQuizError('No review items found.');
+        } else {
+          showQuizError('Not enough questions to start this mode.');
+        }
         return;
       }
-      const questions = shuffle([...stageWords]);
+
+      const preparedWords = mode === 'daily' ? [...sourceWords] : shuffle([...sourceWords]);
+      const questions = preparedWords.slice(0, Math.min(TOTAL, sourceWords.length));
+      TOTAL = questions.length;
+      if (!TOTAL) {
+        showQuizError('Failed to load questions.');
+        return;
+      }
+
+      trackEvent('quiz_started');
+      const streakSummary = updatePlayStreak();
 
       let current = 0;
       let score = 0;
       let correctCount = 0;
       let streak = 0;
 
-      // 방향 선택 (입문·중급 전용): 'KO_EN' | 'EN_KO'
-      // 레벨별로 별도 키를 사용해 독립적으로 저장·복원
-      const dirKey = `quizDir_${level}`;
-      let quizDir = localStorage.getItem(dirKey) || 'KO_EN';
+      const quizDir = supportsQuizDirection(level) ? getQuizDirection(level) : 'KO_EN';
 
-      if (level === 'beginner' || level === 'intermediate') {
-        const wrap = document.getElementById('dirToggleWrap');
-        const btnKO = document.getElementById('dirBtnKO');
-        const btnEN = document.getElementById('dirBtnEN');
-        wrap.style.display = '';
+      let hintUnlockedForQuestion = false;
+      let hintRewardInFlight = false;
+      let currentHintQuestion = null;
 
-        function applyDirUI() {
-          btnKO.classList.toggle('active', quizDir === 'KO_EN');
-          btnEN.classList.toggle('active', quizDir === 'EN_KO');
+      function hideHintRewardUI() {
+        const wrap = document.getElementById('hintRewardWrap');
+        if (wrap) wrap.style.display = 'none';
+      }
+
+      function resetHintRewardState() {
+        hintUnlockedForQuestion = false;
+        hintRewardInFlight = false;
+        currentHintQuestion = null;
+        const panel = document.getElementById('hintRewardPanel');
+        const btn = document.getElementById('hintRewardBtn');
+        if (panel) {
+          panel.style.display = 'none';
+          panel.textContent = '';
         }
-        // 복원된 설정을 버튼 UI에 즉시 반영
-        applyDirUI();
-
-        function setDir(dir) {
-          quizDir = dir;
-          localStorage.setItem(dirKey, dir);
-          applyDirUI();
-          // 현재 문제를 새 방향으로 즉시 재렌더링
-          renderQuestion();
+        if (btn) {
+          btn.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Watch ad for hint';
         }
-        btnKO.addEventListener('click', () => setDir('KO_EN'));
-        btnEN.addEventListener('click', () => setDir('EN_KO'));
+      }
+
+      function applyAdvancedHint(q) {
+        const panel = document.getElementById('hintRewardPanel');
+        const btn = document.getElementById('hintRewardBtn');
+        if (!panel || !q?.hint) return;
+        panel.textContent = `💡 ${q.hint}`;
+        panel.style.display = 'block';
+        if (btn) btn.style.display = 'none';
+      }
+
+      function applyExpertHint(q) {
+        const panel = document.getElementById('hintRewardPanel');
+        const btn = document.getElementById('hintRewardBtn');
+        if (!panel || !Array.isArray(q?.meanings)) return;
+        panel.textContent =
+          'Possible meanings: ' +
+          q.meanings.map(m => `${m.emoji} ${m.english}`).join(' · ');
+        panel.style.display = 'block';
+        if (btn) btn.style.display = 'none';
+      }
+
+      function setupHintRewardUI(q, levelKey) {
+        const wrap = document.getElementById('hintRewardWrap');
+        const btn = document.getElementById('hintRewardBtn');
+        if (!wrap || !btn) return;
+
+        if (levelKey !== 'advanced' && levelKey !== 'expert') {
+          hideHintRewardUI();
+          return;
+        }
+
+        currentHintQuestion = q;
+        wrap.style.display = 'block';
+        btn.style.display = hintUnlockedForQuestion ? 'none' : 'block';
+        btn.disabled = hintRewardInFlight;
+
+        if (hintUnlockedForQuestion) {
+          if (levelKey === 'advanced') applyAdvancedHint(q);
+          else applyExpertHint(q);
+        }
+      }
+
+      async function onHintRewardClick() {
+        if (hintUnlockedForQuestion || hintRewardInFlight || !currentHintQuestion) return;
+
+        const btn = document.getElementById('hintRewardBtn');
+        hintRewardInFlight = true;
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = 'Loading ad...';
+        }
+
+        const result = await requestRewardedHint();
+        hintRewardInFlight = false;
+
+        if (result.rewarded) {
+          hintUnlockedForQuestion = true;
+          if (level === 'advanced') applyAdvancedHint(currentHintQuestion);
+          else if (level === 'expert') applyExpertHint(currentHintQuestion);
+          trackEvent('hint_rewarded');
+          return;
+        }
+
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Watch ad for hint';
+        }
+        alert('Ad is not available right now. Please try again later.');
+      }
+
+      document.getElementById('hintRewardBtn').addEventListener('click', onHintRewardClick);
+
+      function lockHintRewardAfterAnswer() {
+        const btn = document.getElementById('hintRewardBtn');
+        if (btn) btn.disabled = true;
       }
 
       function shuffle(arr) {
@@ -445,10 +613,21 @@
         document.getElementById('nextBtnWrap').className = 'next-btn-wrap';
         document.getElementById('streakBadge').textContent = '';
         document.getElementById('questionSubHint').textContent = '';
+        resetHintRewardState();
       }
 
       function showNextBtn() {
         document.getElementById('nextBtnWrap').className = 'next-btn-wrap show';
+      }
+
+      function markWrongWord(word) {
+        addReviewWord(level, getWordId(word));
+      }
+
+      function markCorrectWord(word) {
+        if (mode === 'review') {
+          removeReviewWord(level, getWordId(word));
+        }
       }
 
       function applyStreak() {
@@ -467,15 +646,18 @@
         const q = questions[current];
 
         if (!q) {
-          showQuizError('데이터를 다시 확인해주세요.');
+          showQuizError('Please check your quiz data.');
           return;
         }
 
         if (level === 'advanced') {
           renderAdvanced(q);
+          setupHintRewardUI(q, 'advanced');
         } else if (level === 'expert') {
           renderExpert(q);
+          setupHintRewardUI(q, 'expert');
         } else {
+          hideHintRewardUI();
           renderMCQ(q);
         }
       }
@@ -513,13 +695,13 @@
           btn.className = 'choice-btn';
           btn.textContent = opt;
           btn.addEventListener('click', () => {
-            handleMCQChoice(btn, opt, correct, feedbackText, feedbackLabel);
+            handleMCQChoice(btn, opt, correct, feedbackText, feedbackLabel, q);
           });
           grid.appendChild(btn);
         });
       }
 
-      function handleMCQChoice(btn, selected, correct, feedbackText, feedbackLabel) {
+      function handleMCQChoice(btn, selected, correct, feedbackText, feedbackLabel, q) {
         document.querySelectorAll('.choice-btn').forEach(b => {
           b.disabled = true;
           if (b.textContent === correct) b.classList.add('correct');
@@ -533,12 +715,14 @@
           btn.classList.add('correct');
           streak++;
           applyStreak();
+          markCorrectWord(q);
           fb.className = 'feedback-box correct show';
           title.textContent = '✓ Correct!';
           hintEl.textContent = feedbackText ? `${feedbackLabel}: ${feedbackText}` : '';
         } else {
           btn.classList.add('wrong');
           streak = 0;
+          markWrongWord(q);
           fb.className = 'feedback-box wrong show';
           title.textContent = '✗ Wrong!';
           hintEl.textContent = `Correct: ${correct}${feedbackText ? ' · ' + feedbackLabel + ': ' + feedbackText : ''}`;
@@ -548,7 +732,7 @@
 
       function renderAdvanced(q) {
         document.getElementById('choicesGrid').style.display = '';
-        document.getElementById('questionTypeLabel').textContent = '빈칸에 알맞은 말은?';
+        document.getElementById('questionTypeLabel').textContent = 'Which word best fits the blank?';
         document.getElementById('questionWord').textContent = q.korean;
         document.getElementById('questionWord').className = 'question-word small';
         document.getElementById('questionSubHint').textContent = q.english;
@@ -570,6 +754,7 @@
       }
 
       function handleAdvancedChoice(btn, selected, q) {
+        lockHintRewardAfterAnswer();
         document.querySelectorAll('.choice-btn').forEach(b => {
           b.disabled = true;
           if (b.textContent === q.answer) b.classList.add('correct');
@@ -584,12 +769,14 @@
           btn.classList.add('correct');
           streak++;
           applyStreak();
+          markCorrectWord(q);
           fb.className = 'feedback-box correct show';
           title.textContent = '✓ Correct!';
           hintEl.innerHTML = `<strong>${fullSentence}</strong><br><em>${q.english}</em><br>💡 ${q.hint}`;
         } else {
           btn.classList.add('wrong');
           streak = 0;
+          markWrongWord(q);
           fb.className = 'feedback-box wrong show';
           title.textContent = '✗ Wrong!';
           hintEl.innerHTML = `<strong>${fullSentence}</strong><br><em>${q.english}</em><br>💡 ${q.hint}`;
@@ -629,6 +816,7 @@
       }
 
       function handleExpertChoice(btn, selected, q, target) {
+        lockHintRewardAfterAnswer();
         document.querySelectorAll('.choice-btn').forEach(b => {
           b.disabled = true;
           if (b.textContent === target.english) b.classList.add('correct');
@@ -646,6 +834,7 @@
           btn.classList.add('correct');
           streak++;
           applyStreak();
+          markCorrectWord(q);
           fb.className = 'feedback-box correct show';
           title.textContent = '✓ Correct!';
           hintEl.innerHTML =
@@ -653,6 +842,7 @@
         } else {
           btn.classList.add('wrong');
           streak = 0;
+          markWrongWord(q);
           fb.className = 'feedback-box wrong show';
           title.textContent = '✗ Wrong!';
           hintEl.innerHTML =
@@ -668,8 +858,11 @@
           const query = new URLSearchParams({
             level,
             stage: String(stage),
+            mode,
             score: String(score),
             correct: String(correctCount),
+            totalQuestions: String(TOTAL),
+            streakCurrent: String(streakSummary.current),
             totalStages: String(totalStages),
             v: WEB_VERSION,
           }).toString();

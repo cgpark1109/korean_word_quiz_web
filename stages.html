@@ -38,6 +38,48 @@
       gap: 10px;
       padding: 0 20px 24px;
     }
+    .retention-panel {
+      margin: 0 20px 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .retention-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .retention-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .dir-toggle-wrap {
+      display: flex;
+      gap: 8px;
+    }
+    .dir-btn {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s, color 0.18s;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .dir-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+    }
     .stage-card {
       display: flex;
       align-items: center;
@@ -98,7 +140,28 @@
       color: var(--text-muted);
     }
   </style>
-  <script src="./js/app.js?v=20260528-1"></script>
+  <script src="./js/app.js?v=20260603-5"></script>
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      if (params.get('level')) {
+        sessionStorage.removeItem('force_daily_quiz');
+        return;
+      }
+      if (sessionStorage.getItem('force_daily_quiz') !== '1') return;
+      sessionStorage.removeItem('force_daily_quiz');
+      const level = resolveStageLevel();
+      const version = params.get('v') || '20260603-5';
+      const target = new URL('quiz.html', location.href);
+      target.searchParams.set('level', level);
+      target.searchParams.set('mode', 'daily');
+      target.searchParams.set('daily', '1');
+      target.searchParams.set('count', '3');
+      target.searchParams.set('source', 'home');
+      target.searchParams.set('v', version);
+      location.replace(target.toString());
+    })();
+  </script>
 </head>
 <body>
   <div class="top-bar">
@@ -106,13 +169,23 @@
     <div class="page-title" id="pageTitle">Stages</div>
   </div>
   <p class="stage-hint" id="stageHint">Each stage has 10 questions.</p>
+  <div class="retention-panel">
+    <div class="retention-meta" id="streakMeta">Current streak: 0 days</div>
+    <div id="dirPanel" style="display:none;">
+      <div class="retention-label">Quiz direction</div>
+      <div class="dir-toggle-wrap">
+        <button type="button" class="dir-btn active" id="dirBtnKO">Korean → English</button>
+        <button type="button" class="dir-btn" id="dirBtnEN">English → Korean</button>
+      </div>
+    </div>
+  </div>
   <div class="stage-list" id="stageList"></div>
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260528-1';
+      new URLSearchParams(window.location.search).get('v') || '20260603-5';
     const QUESTIONS_PER_STAGE = 10;
-    const level = new URLSearchParams(location.search).get('level') || 'beginner';
+    const level = resolveStageLevel();
     const wordCounts = {
       beginner: 70,
       intermediate: 50,
@@ -126,10 +199,10 @@
       expert: '⭐',
     };
     const levelNames = {
-      beginner: '입문',
-      intermediate: '중급',
-      advanced: '고급',
-      expert: '특급',
+      beginner: 'Beginner',
+      intermediate: 'Intermediate',
+      advanced: 'Advanced',
+      expert: 'Expert',
     };
 
     const totalWords = wordCounts[level] || 30;
@@ -139,6 +212,16 @@
       `${levelIcons[level] || ''} ${levelNames[level] || level} · Stages`.trim();
     document.getElementById('stageHint').textContent =
       `${totalStages} stages · 10 questions each · ${totalWords} words total`;
+
+    function formatDayCount(count) {
+      return `${count} ${count === 1 ? 'day' : 'days'}`;
+    }
+
+    const streak = getPlayStreak();
+    document.getElementById('streakMeta').textContent =
+      streak.current > 0
+        ? `Current streak ${formatDayCount(streak.current)} · Best ${formatDayCount(streak.best)}`
+        : 'Use Daily 3 from Home to start your streak';
 
     const backUrl = new URL('index.html', location.href);
     backUrl.searchParams.set('v', WEB_VERSION);
@@ -155,6 +238,31 @@
 
     function isCleared(n) {
       return localStorage.getItem(stageKey(n)) === 'true';
+    }
+
+    if (supportsQuizDirection(level)) {
+      const dirPanel = document.getElementById('dirPanel');
+      const btnKO = document.getElementById('dirBtnKO');
+      const btnEN = document.getElementById('dirBtnEN');
+      dirPanel.style.display = 'flex';
+      dirPanel.style.flexDirection = 'column';
+      dirPanel.style.gap = '8px';
+
+      function applyDirUI() {
+        const dir = getQuizDirection(level);
+        btnKO.classList.toggle('active', dir === 'KO_EN');
+        btnEN.classList.toggle('active', dir === 'EN_KO');
+      }
+      applyDirUI();
+
+      btnKO.addEventListener('click', () => {
+        setQuizDirection(level, 'KO_EN');
+        applyDirUI();
+      });
+      btnEN.addEventListener('click', () => {
+        setQuizDirection(level, 'EN_KO');
+        applyDirUI();
+      });
     }
 
     const list = document.getElementById('stageList');
