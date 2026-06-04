@@ -1,7 +1,31 @@
 {
-  "popup": { "active": false, "title": "", "message": "", "button": "OK", "version": "1.0" },
+  "popup": {
+    "active": true,
+    "title": "June Update",
+    "message": "2 new stages per level, faster content updates, and back button fixes. Enjoy learning!",
+    "button": "OK",
+    "version": "2026-06-04"
+  },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-stages-update",
+      "revision": 1,
+      "active": true,
+      "title": "New Stages Added",
+      "message": "2 new stages in every level: Beginner 9, Intermediate 7, Advanced 7, and Expert 6 stages (10 questions each). 90 new words and proverbs in total.",
+      "date": "2026-06-04",
+      "button": "OK"
+    },
+    {
+      "id": "2026-06-app-improvements",
+      "revision": 1,
+      "active": true,
+      "title": "App Improvements",
+      "message": "Web content now updates automatically without clearing cache. The back button exits the app from Home, and goes back inside quizzes and settings.",
+      "date": "2026-06-04",
+      "button": "OK"
+    },
     {
       "id": "2026-06-daily",
       "revision": 1,
@@ -17,7 +41,8 @@
       "active": true,
       "title": "Review Mode Added",
       "message": "Wrong answers are now saved automatically so you can review them later.",
-      "date": "2026-06-02"
+      "date": "2026-06-02",
+      "button": "OK"
     }
   ]
 }

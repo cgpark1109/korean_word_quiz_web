@@ -344,10 +344,10 @@
     }
     const QUESTIONS_PER_STAGE = 10;
     const wordCounts = {
-      beginner: 70,
-      intermediate: 50,
-      advanced: 50,
-      expert: 40,
+      beginner: 90,
+      intermediate: 70,
+      advanced: 70,
+      expert: 60,
     };
     const totalStages = Math.ceil((wordCounts[level] || 30) / QUESTIONS_PER_STAGE);
     let stage = parseInt(urlParams.get('stage') || '1', 10);
