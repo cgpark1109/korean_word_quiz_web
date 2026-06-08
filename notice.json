@@ -1,19 +1,28 @@
 {
   "popup": {
     "active": true,
-    "title": "June Update",
-    "message": "2 new stages per level, faster content updates, and back button fixes. Enjoy learning!",
+    "title": "Beginner Update",
+    "message": "4 new Beginner stages with 40 everyday words. Now 13 stages and 130 words in total!",
     "button": "OK",
-    "version": "2026-06-04"
+    "version": "2026-06-06"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-beginner-stages",
+      "revision": 1,
+      "active": true,
+      "title": "Beginner Stages Expanded",
+      "message": "4 new Beginner stages added: now 13 stages with 130 words (10 questions each). Learn family, places, colors, days, and time expressions.",
+      "date": "2026-06-06",
+      "button": "OK"
+    },
     {
       "id": "2026-06-stages-update",
       "revision": 1,
       "active": true,
       "title": "New Stages Added",
-      "message": "2 new stages in every level: Beginner 9, Intermediate 7, Advanced 7, and Expert 6 stages (10 questions each). 90 new words and proverbs in total.",
+      "message": "2 new stages in every level: Beginner 9, Intermediate 7, Advanced 7, and Expert 6 stages (10 questions each). 80 new words and proverbs in total.",
       "date": "2026-06-04",
       "button": "OK"
     },
