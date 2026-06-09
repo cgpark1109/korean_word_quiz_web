@@ -2,19 +2,19 @@
   "popup": {
     "active": true,
     "title": "Beginner Update",
-    "message": "4 new Beginner stages with 40 everyday words. Now 13 stages and 130 words in total!",
+    "message": "4 more Beginner stages with 40 new words. Now 17 stages and 170 words in total!",
     "button": "OK",
-    "version": "2026-06-06"
+    "version": "2026-06-09"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
     {
       "id": "2026-06-beginner-stages",
-      "revision": 1,
+      "revision": 2,
       "active": true,
       "title": "Beginner Stages Expanded",
-      "message": "4 new Beginner stages added: now 13 stages with 130 words (10 questions each). Learn family, places, colors, days, and time expressions.",
-      "date": "2026-06-06",
+      "message": "4 more Beginner stages added. Beginner now has 17 stages with 170 words (10 questions each). Also fixed minor typo issues.",
+      "date": "2026-06-09",
       "button": "OK"
     },
     {
