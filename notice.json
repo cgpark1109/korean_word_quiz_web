@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Beginner Update",
-    "message": "4 more Beginner stages with 40 new words. Now 17 stages and 170 words in total!",
+    "title": "Advanced Update",
+    "message": "2 new Advanced stages with 20 Korean proverbs. Now 9 stages and 90 proverbs in total!",
     "button": "OK",
-    "version": "2026-06-09"
+    "version": "2026-06-09-adv"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-advanced-stages",
+      "revision": 1,
+      "active": true,
+      "title": "Advanced Stages Expanded",
+      "message": "2 new Advanced stages added. Advanced now has 9 stages with 90 Korean proverbs (10 questions each). Practice everyday idioms like \"누워서 침 먹기\" and \"백문이 불여일견\".",
+      "date": "2026-06-09",
+      "button": "OK"
+    },
     {
       "id": "2026-06-beginner-stages",
       "revision": 2,
