@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Intermediate Update",
-    "message": "4 new Intermediate stages with 40 adjectives and emotions. Now 11 stages and 110 words in total!",
+    "title": "Expert Update",
+    "message": "4 new Expert stages with 40 Korean homophones. Now 10 stages and 100 words in total!",
     "button": "OK",
-    "version": "2026-06-11-int"
+    "version": "2026-06-13-exp"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-expert-stages",
+      "revision": 1,
+      "active": true,
+      "title": "Expert Stages Expanded",
+      "message": "4 new Expert stages added. Expert now has 10 stages with 100 Korean homophones (10 questions each). Practice tricky words like \"산\" (mountain / acid / coral), \"화\" (fire / flower / speech / anger), and \"사\" (four / death / affair / company).",
+      "date": "2026-06-13",
+      "button": "OK"
+    },
     {
       "id": "2026-06-intermediate-stages",
       "revision": 1,
