@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Expert Update",
-    "message": "4 new Expert stages with 40 Korean homophones. Now 10 stages and 100 words in total!",
+    "title": "Beginner Update",
+    "message": "4 new Beginner stages with 40 everyday words. Now 21 stages and 210 words in total!",
     "button": "OK",
-    "version": "2026-06-13-exp"
+    "version": "2026-06-13-beg"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-beginner-stages",
+      "revision": 3,
+      "active": true,
+      "title": "Beginner Stages Expanded",
+      "message": "4 new Beginner stages added. Beginner now has 21 stages with 210 words (10 questions each). Learn animals, food, school supplies, and body parts like \"코끼리\", \"당근\", \"지우개\", and \"손가락\".",
+      "date": "2026-06-13",
+      "button": "OK"
+    },
     {
       "id": "2026-06-expert-stages",
       "revision": 1,
@@ -38,7 +47,7 @@
     {
       "id": "2026-06-beginner-stages",
       "revision": 2,
-      "active": true,
+      "active": false,
       "title": "Beginner Stages Expanded",
       "message": "4 more Beginner stages added. Beginner now has 17 stages with 170 words (10 questions each). Also fixed minor typo issues.",
       "date": "2026-06-09",
