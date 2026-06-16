@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Beginner Update",
-    "message": "4 new Beginner stages with 40 everyday words. Now 21 stages and 210 words in total!",
+    "title": "Intermediate Update",
+    "message": "4 new Intermediate stages with 40 adjectives and emotions. Now 15 stages and 150 words in total!",
     "button": "OK",
-    "version": "2026-06-15-beg"
+    "version": "2026-06-16-int"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-intermediate-stages",
+      "revision": 2,
+      "active": true,
+      "title": "Intermediate Stages Expanded",
+      "message": "4 new Intermediate stages added. Intermediate now has 15 stages with 150 adjectives and emotions (10 questions each). Practice words like \"매콤하다\", \"겸손하다\", and \"애매하다\".",
+      "date": "2026-06-16",
+      "button": "OK"
+    },
     {
       "id": "2026-06-beginner-stages",
       "revision": 3,
@@ -29,7 +38,7 @@
     {
       "id": "2026-06-intermediate-stages",
       "revision": 1,
-      "active": true,
+      "active": false,
       "title": "Intermediate Stages Expanded",
       "message": "4 new Intermediate stages added. Intermediate now has 11 stages with 110 adjectives and emotions (10 questions each). Practice words like \"차분하다\", \"뿌듯하다\", and \"믿음직하다\".",
       "date": "2026-06-11",
