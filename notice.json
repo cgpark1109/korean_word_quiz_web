@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Intermediate Update",
-    "message": "4 new Intermediate stages with 40 adjectives and emotions. Now 15 stages and 150 words in total!",
+    "title": "Advanced Update",
+    "message": "4 new Advanced stages with 40 Korean proverbs. Now 13 stages and 130 proverbs in total!",
     "button": "OK",
-    "version": "2026-06-16-int"
+    "version": "2026-06-17-adv"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-advanced-stages",
+      "revision": 2,
+      "active": true,
+      "title": "Advanced Stages Expanded",
+      "message": "4 new Advanced stages added. Advanced now has 13 stages with 130 Korean proverbs (10 questions each). Practice idioms like \"꿩 먹고 알 먹고\", \"방 안에 떡\", and \"말이 씨가 된다\".",
+      "date": "2026-06-17",
+      "button": "OK"
+    },
     {
       "id": "2026-06-intermediate-stages",
       "revision": 2,
@@ -47,7 +56,7 @@
     {
       "id": "2026-06-advanced-stages",
       "revision": 1,
-      "active": true,
+      "active": false,
       "title": "Advanced Stages Expanded",
       "message": "2 new Advanced stages added. Advanced now has 9 stages with 90 Korean proverbs (10 questions each). Practice everyday idioms like \"누워서 침 먹기\" and \"백문이 불여일견\".",
       "date": "2026-06-09",
