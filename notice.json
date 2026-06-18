@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Advanced Update",
-    "message": "4 new Advanced stages with 40 Korean proverbs. Now 13 stages and 130 proverbs in total!",
+    "title": "Expert Update",
+    "message": "4 new Expert stages with 40 Korean homophones. Now 14 stages and 140 homophones in total!",
     "button": "OK",
-    "version": "2026-06-17-adv"
+    "version": "2026-06-18-exp"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-expert-stages",
+      "revision": 2,
+      "active": true,
+      "title": "Expert Stages Expanded",
+      "message": "4 new Expert stages added. Expert now has 14 stages with 140 Korean homophones (10 questions each). Practice tricky words like \"맞다\" (correct / hit / fit), \"역\" (station / reverse / role), and \"금\" (gold / forbidden / crack).",
+      "date": "2026-06-18",
+      "button": "OK"
+    },
     {
       "id": "2026-06-advanced-stages",
       "revision": 2,
@@ -38,7 +47,7 @@
     {
       "id": "2026-06-expert-stages",
       "revision": 1,
-      "active": true,
+      "active": false,
       "title": "Expert Stages Expanded",
       "message": "4 new Expert stages added. Expert now has 10 stages with 100 Korean homophones (10 questions each). Practice tricky words like \"산\" (mountain / acid / coral), \"화\" (fire / flower / speech / anger), and \"사\" (four / death / affair / company).",
       "date": "2026-06-15",

@@ -760,5 +760,307 @@ const WordData = {
         { english: 'Valley', emoji: '🏞️', example: '골짜기가 깊다 (The valley is deep)' },
       ],
     },
+    {
+      korean: '맞다',
+      meanings: [
+        { english: 'Correct / Right', emoji: '✅', example: '답이 맞다 (The answer is correct)' },
+        { english: 'To get hit / struck', emoji: '👊', example: '비를 맞다 (Get hit by rain)' },
+        { english: 'To fit (size)', emoji: '👕', example: '옷이 맞다 (The clothes fit)' },
+      ],
+    },
+    {
+      korean: '맡다',
+      meanings: [
+        { english: 'To entrust / take charge', emoji: '🤝', example: '일을 맡다 (Take charge of work)' },
+        { english: 'To sniff / smell', emoji: '👃', example: '꽃향기를 맡다 (Smell the flower scent)' },
+      ],
+    },
+    {
+      korean: '말다',
+      meanings: [
+        { english: 'To stop (doing)', emoji: '🛑', example: '그만 말아 (Stop it)' },
+        { english: 'To wind / coil', emoji: '🧵', example: '실을 말다 (Wind thread)' },
+      ],
+    },
+    {
+      korean: '나다',
+      meanings: [
+        { english: 'To be born', emoji: '👶', example: '아기가 나다 (A baby is born)' },
+        { english: 'To break out / appear', emoji: '🔴', example: '두드러기가 나다 (A rash breaks out)' },
+      ],
+    },
+    {
+      korean: '배다',
+      meanings: [
+        { english: 'To be jealous', emoji: '😒', example: '시기가 배다 (Feel jealous)' },
+        { english: 'To soak through / permeate', emoji: '💧', example: '냄새가 배다 (The smell soaks in)' },
+      ],
+    },
+    {
+      korean: '꾸다',
+      meanings: [
+        { english: 'To dream', emoji: '💤', example: '좋은 꿈을 꾸다 (Have a good dream)' },
+        { english: 'To harbor / hold (a wish)', emoji: '🌟', example: '소원을 꾸다 (Harbor a wish)' },
+      ],
+    },
+    {
+      korean: '돌',
+      meanings: [
+        { english: 'Stone / rock', emoji: '🪨', example: '돌을 던지다 (Throw a stone)' },
+        { english: 'Birthday year (age milestone)', emoji: '🎂', example: '돌잔치를 하다 (Hold a first birthday party)' },
+      ],
+    },
+    {
+      korean: '담',
+      meanings: [
+        { english: 'Wall / fence', emoji: '🧱', example: '담을 쌓다 (Build a wall)' },
+        { english: 'Freshwater (not saltwater)', emoji: '💧', example: '담수어 (Freshwater fish)' },
+      ],
+    },
+    {
+      korean: '타다',
+      meanings: [
+        { english: 'To ride', emoji: '🚌', example: '버스를 타다 (Ride a bus)' },
+        { english: 'To burn', emoji: '🔥', example: '불에 타다 (Burn in fire)' },
+        { english: 'To lose (weight)', emoji: '📉', example: '살이 타다 (Lose weight)' },
+      ],
+    },
+    {
+      korean: '치다',
+      meanings: [
+        { english: 'To hit / strike', emoji: '👊', example: '공을 치다 (Hit a ball)' },
+        { english: 'To play (instrument)', emoji: '🎹', example: '피아노를 치다 (Play the piano)' },
+        { english: 'To do (laundry)', emoji: '🧺', example: '빨래를 치다 (Do the laundry)' },
+      ],
+    },
+    {
+      korean: '걸다',
+      meanings: [
+        { english: 'To hang', emoji: '🖼️', example: '옷을 걸다 (Hang clothes)' },
+        { english: 'To bet / wager', emoji: '🎲', example: '내기를 걸다 (Place a bet)' },
+        { english: 'To catch (a cold)', emoji: '🤧', example: '감기에 걸리다 (Catch a cold)' },
+      ],
+    },
+    {
+      korean: '역',
+      meanings: [
+        { english: 'Station (train/subway)', emoji: '🚉', example: '역에 도착하다 (Arrive at the station)' },
+        { english: 'Reverse / opposite', emoji: '↩️', example: '역방향 (Opposite direction)' },
+        { english: 'Role / part', emoji: '🎭', example: '주역을 맡다 (Take the leading role)' },
+      ],
+    },
+    {
+      korean: '열',
+      meanings: [
+        { english: 'Fever / heat', emoji: '🌡️', example: '열이 나다 (Have a fever)' },
+        { english: 'Row / line', emoji: '➡️', example: '한 열로 서다 (Stand in a row)' },
+        { english: 'Ten (number)', emoji: '🔟', example: '열 명 (Ten people)' },
+      ],
+    },
+    {
+      korean: '영',
+      meanings: [
+        { english: 'Zero', emoji: '0️⃣', example: '영 점 (Zero points)' },
+        { english: 'Spirit / soul', emoji: '👻', example: '영혼 (Soul)' },
+        { english: 'Hero / brave person', emoji: '🦸', example: '영웅이 되다 (Become a hero)' },
+      ],
+    },
+    {
+      korean: '예',
+      meanings: [
+        { english: 'Yes', emoji: '👍', example: '예, 알겠습니다 (Yes, I understand)' },
+        { english: 'Ceremony / ritual', emoji: '🎎', example: '예식을 올리다 (Hold a wedding ceremony)' },
+        { english: 'Previous / before', emoji: '⏮️', example: '예고편 (Preview / trailer)' },
+      ],
+    },
+    {
+      korean: '욕',
+      meanings: [
+        { english: 'Bath / bathing', emoji: '🛁', example: '목욕을 하다 (Take a bath)' },
+        { english: 'Swearing / curse words', emoji: '🤬', example: '욕을 하다 (Swear / use bad language)' },
+      ],
+    },
+    {
+      korean: '은',
+      meanings: [
+        { english: 'Silver (metal)', emoji: '🥈', example: '은반지 (Silver ring)' },
+        { english: 'Grace / kindness', emoji: '💝', example: '은혜를 입다 (Receive kindness)' },
+      ],
+    },
+    {
+      korean: '인',
+      meanings: [
+        { english: 'Person / human', emoji: '🧑', example: '인간 (Human being)' },
+        { english: 'Seal / stamp', emoji: '🔏', example: '도장을 찍다 (Stamp a seal)' },
+        { english: 'Benevolence / virtue', emoji: '❤️', example: '인을 베풀다 (Show benevolence)' },
+      ],
+    },
+    {
+      korean: '재',
+      meanings: [
+        { english: 'Again / re-', emoji: '🔁', example: '재시험 (Retest)' },
+        { english: 'Ash', emoji: '🌫️', example: '재가 되다 (Turn to ash)' },
+        { english: 'Talent / ability', emoji: '🌟', example: '재능이 있다 (Have talent)' },
+      ],
+    },
+    {
+      korean: '제',
+      meanings: [
+        { english: 'My (humble)', emoji: '🙇', example: '제 이름은 (My name is)' },
+        { english: 'Rule / regulation', emoji: '📜', example: '규칙과 제도 (Rules and systems)' },
+        { english: 'Offering / tribute', emoji: '🎁', example: '제물을 바치다 (Offer a tribute)' },
+      ],
+    },
+    {
+      korean: '조',
+      meanings: [
+        { english: 'Group / faction', emoji: '👥', example: '같은 조 (Same group)' },
+        { english: 'Tune / melody', emoji: '🎵', example: '조를 맞추다 (Match the tune)' },
+        { english: 'Morning (archaic)', emoji: '🌅', example: '조야 (Late night to early morning)' },
+      ],
+    },
+    {
+      korean: '주',
+      meanings: [
+        { english: 'Lord / master', emoji: '👑', example: '주인 (Master / owner)' },
+        { english: 'Main / principal', emoji: '⭐', example: '주요한 일 (Main task)' },
+        { english: 'Week', emoji: '📅', example: '이번 주 (This week)' },
+      ],
+    },
+    {
+      korean: '지',
+      meanings: [
+        { english: 'Knowledge / wisdom', emoji: '📚', example: '지식이 풍부하다 (Rich in knowledge)' },
+        { english: 'Letter / written note', emoji: '✉️', example: '한지에 글씨를 쓰다 (Write on traditional paper)' },
+        { english: 'Earth / ground', emoji: '🌍', example: '지구 (The Earth)' },
+      ],
+    },
+    {
+      korean: '짐',
+      meanings: [
+        { english: 'Luggage / baggage', emoji: '🧳', example: '짐을 싸다 (Pack luggage)' },
+        { english: 'Burden / trouble', emoji: '😓', example: '짐이 되다 (Become a burden)' },
+      ],
+    },
+    {
+      korean: '천',
+      meanings: [
+        { english: 'Thousand', emoji: '🔢', example: '천 원 (One thousand won)' },
+        { english: 'Heaven / sky', emoji: '☁️', example: '하늘과 땅 (Heaven and earth)' },
+        { english: 'Fabric / cloth', emoji: '🧵', example: '천을 자르다 (Cut fabric)' },
+      ],
+    },
+    {
+      korean: '친',
+      meanings: [
+        { english: 'Friend', emoji: '👫', example: '친구 (Friend)' },
+        { english: 'Close / intimate', emoji: '🤗', example: '친한 사이 (Close relationship)' },
+      ],
+    },
+    {
+      korean: '토',
+      meanings: [
+        { english: 'Soil / earth', emoji: '🟤', example: '흙과 토양 (Soil and earth)' },
+        { english: 'To vomit', emoji: '🤢', example: '토하다 (Vomit)' },
+      ],
+    },
+    {
+      korean: '편',
+      meanings: [
+        { english: 'Side', emoji: '↔️', example: '왼쪽 편 (Left side)' },
+        { english: 'Convenient / comfortable', emoji: '😌', example: '편하다 (Be comfortable)' },
+        { english: 'Volume (of a book)', emoji: '📚', example: '1편 (Volume one)' },
+      ],
+    },
+    {
+      korean: '폐',
+      meanings: [
+        { english: 'Lung', emoji: '🫁', example: '폐가 약하다 (Have weak lungs)' },
+        { english: 'To abolish', emoji: '🚫', example: '제도를 폐지하다 (Abolish a system)' },
+        { english: 'Harm / damage', emoji: '💔', example: '폐를 끼치다 (Cause harm)' },
+      ],
+    },
+    {
+      korean: '필',
+      meanings: [
+        { english: 'Certainly / surely', emoji: '✅', example: '필히 오다 (Surely come)' },
+        { english: 'Writing brush', emoji: '🖌️', example: '붓을 들다 (Hold a brush)' },
+      ],
+    },
+    {
+      korean: '학',
+      meanings: [
+        { english: 'School / learning', emoji: '🏫', example: '학교에 가다 (Go to school)' },
+        { english: 'Crane (bird)', emoji: '🦩', example: '학이 날다 (A crane flies)' },
+      ],
+    },
+    {
+      korean: '형',
+      meanings: [
+        { english: 'Older brother', emoji: '👦', example: '형이 있다 (I have an older brother)' },
+        { english: 'Form / type', emoji: '📋', example: '형태 (Form / shape)' },
+        { english: 'Punishment / penalty', emoji: '⚖️', example: '형을 선고하다 (Sentence punishment)' },
+      ],
+    },
+    {
+      korean: '후',
+      meanings: [
+        { english: 'After / later', emoji: '⏭️', example: '이후 (After this)' },
+        { english: 'Candidate / successor', emoji: '🗳️', example: '후보 (Candidate)' },
+      ],
+    },
+    {
+      korean: '끝',
+      meanings: [
+        { english: 'End / finish', emoji: '🏁', example: '끝이 나다 (Come to an end)' },
+        { english: 'Tip / edge (of something)', emoji: '✂️', example: '머리끝 (Tip of hair)' },
+      ],
+    },
+    {
+      korean: '걸',
+      meanings: [
+        { english: 'Crab', emoji: '🦀', example: '게와 걸 (Crabs)' },
+        { english: 'About (time duration)', emoji: '⏱️', example: '한 시간 걸리다 (Take about an hour)' },
+      ],
+    },
+    {
+      korean: '과',
+      meanings: [
+        { english: 'Fruit', emoji: '🍎', example: '과일 (Fruit)' },
+        { english: 'Department / section', emoji: '🏢', example: '영업과 (Sales department)' },
+        { english: 'Excess / too much', emoji: '⚠️', example: '과식하다 (Overeat)' },
+      ],
+    },
+    {
+      korean: '관',
+      meanings: [
+        { english: 'Pipe / tube', emoji: '🔧', example: '수도관 (Water pipe)' },
+        { english: 'Government office', emoji: '🏛️', example: '관청 (Government office)' },
+        { english: 'Coffin', emoji: '⚰️', example: '관에 넣다 (Place in a coffin)' },
+      ],
+    },
+    {
+      korean: '구',
+      meanings: [
+        { english: 'District / ward', emoji: '🗺️', example: '강남구 (Gangnam district)' },
+        { english: 'Nine (number)', emoji: '9️⃣', example: '구 명 (Nine people)' },
+        { english: 'Sphere / bead', emoji: '🔮', example: '구슬을 굴리다 (Roll a marble)' },
+      ],
+    },
+    {
+      korean: '굽',
+      meanings: [
+        { english: 'Heel (of shoe)', emoji: '👠', example: '굽이 높다 (High heels)' },
+        { english: 'To bake', emoji: '🍞', example: '빵을 굽다 (Bake bread)' },
+      ],
+    },
+    {
+      korean: '금',
+      meanings: [
+        { english: 'Gold (metal)', emoji: '🥇', example: '금반지 (Gold ring)' },
+        { english: 'Forbidden / not allowed', emoji: '🚫', example: '금지하다 (Forbid)' },
+        { english: 'Crack / fissure', emoji: '💔', example: '금이 가다 (A crack forms)' },
+      ],
+    },
   ],
 };
