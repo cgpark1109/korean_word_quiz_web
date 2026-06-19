@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Expert Update",
-    "message": "4 new Expert stages with 40 Korean homophones. Now 14 stages and 140 homophones in total!",
+    "title": "New Stages Update",
+    "message": "2 new stages in every level! 80 new words and proverbs in total. Beginner 23, Intermediate 17, Advanced 15, and Expert 16 stages.",
     "button": "OK",
-    "version": "2026-06-18-exp"
+    "version": "2026-06-19-all"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-all-stages",
+      "revision": 1,
+      "active": true,
+      "title": "All Levels Expanded",
+      "message": "2 new stages added to every level. Beginner now has 23 stages (230 words), Intermediate 17 stages (170 words), Advanced 15 stages (150 proverbs), and Expert 16 stages (160 homophones). Learn animals like \"펭귄\" and \"호랑이\", personality words like \"정중하다\" and \"세련되다\", proverbs like \"계란으로 바위치기\", and homophones like \"녹\" (green / record / melt) and \"물\" (water / goods / opportunity).",
+      "date": "2026-06-19",
+      "button": "OK"
+    },
     {
       "id": "2026-06-expert-stages",
       "revision": 2,
