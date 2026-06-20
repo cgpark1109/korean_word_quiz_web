@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "New Stages Update",
-    "message": "2 new stages in every level! 80 new words and proverbs in total. Beginner 23, Intermediate 17, Advanced 15, and Expert 16 stages.",
+    "title": "Beginner Update",
+    "message": "7 new Beginner stages with 70 words! Beginner now has 30 stages and 300 words in total.",
     "button": "OK",
-    "version": "2026-06-19-all"
+    "version": "2026-06-20-beg"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-beginner-30-stages",
+      "revision": 1,
+      "active": true,
+      "title": "Beginner Reaches 30 Stages",
+      "message": "7 new Beginner stages added. Beginner now has 30 stages with 300 words (10 questions each). Learn kitchen items like \"냄비\" and \"프라이팬\", jobs like \"의사\" and \"요리사\", body parts like \"눈썹\" and \"이마\", and daily items like \"에어컨\" and \"충전기\".",
+      "date": "2026-06-20",
+      "button": "OK"
+    },
     {
       "id": "2026-06-all-stages",
       "revision": 1,
