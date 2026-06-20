@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Beginner Update",
-    "message": "7 new Beginner stages with 70 words! Beginner now has 30 stages and 300 words in total.",
+    "title": "Daily Quiz Update",
+    "message": "Daily quiz is now 10 questions! Random words from the full level pool every day.",
     "button": "OK",
-    "version": "2026-06-20-beg"
+    "version": "2026-06-20-daily"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-daily-10",
+      "revision": 1,
+      "active": true,
+      "title": "Daily 10 Questions",
+      "message": "Daily quiz now has 10 questions (up from 3). Each day, 10 random words are picked from the full word pool of your current level — all stages included.",
+      "date": "2026-06-20",
+      "button": "OK"
+    },
     {
       "id": "2026-06-beginner-30-stages",
       "revision": 1,

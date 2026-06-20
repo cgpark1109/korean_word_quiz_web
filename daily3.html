@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Daily 3 Redirect</title>
+  <title>Daily 10 Redirect</title>
   <link rel="stylesheet" href="./css/base.css?v=20260603-3">
   <style>
     body {
@@ -18,7 +18,7 @@
   </style>
 </head>
 <body>
-  <div>Starting Daily 3...</div>
+  <div>Starting Daily 10...</div>
   <script>
     const params = new URLSearchParams(location.search);
     const levelFromQuery = params.get('level');
@@ -31,7 +31,7 @@
     target.searchParams.set('level', level);
     target.searchParams.set('mode', 'daily');
     target.searchParams.set('daily', '1');
-    target.searchParams.set('count', '3');
+    target.searchParams.set('count', '10');
     target.searchParams.set('source', 'home');
     target.searchParams.set('v', webVersion);
     location.replace(target.toString());

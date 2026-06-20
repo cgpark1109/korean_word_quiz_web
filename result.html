@@ -140,7 +140,7 @@
 
     <div class="action-btns">
       <a class="btn-primary" id="reviewLink" href="#" style="display:none;">Start Review →</a>
-      <a class="btn-secondary" id="dailyLink" href="#">Daily 3 Questions</a>
+      <a class="btn-secondary" id="dailyLink" href="#">Daily 10 Questions</a>
       <a class="btn-primary" id="nextStageLink" href="#" style="display:none;">Next Stage →</a>
       <a class="btn-primary" id="tryAgainLink" href="#">Try Again</a>
       <a class="btn-secondary" id="stagesLink" href="#">All Stages</a>
@@ -216,7 +216,7 @@
     if (mode === 'stage') {
       retryUrl.searchParams.set('stage', String(stage));
     } else if (mode === 'daily') {
-      retryUrl.searchParams.set('count', '3');
+      retryUrl.searchParams.set('count', String(DAILY_QUESTION_COUNT));
     } else if (mode === 'review') {
       retryUrl.searchParams.set('count', String(Math.max(1, Math.min(5, getReviewWordIds(level).length))));
     }

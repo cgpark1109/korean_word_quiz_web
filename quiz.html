@@ -331,7 +331,8 @@
       forceDailyFlag ||
       dailyFlag ||
       requestedMode === 'daily' ||
-      (source === 'home' && countParam === '3' && !urlParams.has('stage')) ||
+      (source === 'home' && countParam === String(DAILY_QUESTION_COUNT) && !urlParams.has('stage')) ||
+      (countParam === String(DAILY_QUESTION_COUNT) && !urlParams.has('stage')) ||
       (countParam === '3' && !urlParams.has('stage'))
     ) {
       mode = 'daily';
@@ -354,7 +355,7 @@
     if (!Number.isFinite(stage) || stage < 1) stage = 1;
     if (stage > totalStages) stage = totalStages;
     let TOTAL = QUESTIONS_PER_STAGE;
-    if (mode === 'daily') TOTAL = 3;
+    if (mode === 'daily') TOTAL = DAILY_QUESTION_COUNT;
     else if (mode === 'review' && Number.isFinite(requestedCount) && requestedCount > 0) {
       TOTAL = Math.min(10, requestedCount);
     }
@@ -381,7 +382,7 @@
     backUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('backBtn').href = backUrl.toString();
     const modeLabel =
-      mode === 'review' ? 'Review' : mode === 'daily' ? 'Daily 3' : `Stage ${stage}`;
+      mode === 'review' ? 'Review' : mode === 'daily' ? `Daily ${DAILY_QUESTION_COUNT}` : `Stage ${stage}`;
     document.getElementById('levelBadge').textContent =
       `${levelIcons[level] || ''} ${levelNames[level] || level} · ${modeLabel}`.trim();
 
@@ -423,16 +424,7 @@
       }
 
       function getDailyWords() {
-        let maxUnlockedStage = 1;
-        for (let n = 2; n <= totalStages; n++) {
-          if (localStorage.getItem(`stage_cleared_${level}_${n - 1}`) === 'true') {
-            maxUnlockedStage = n;
-          } else {
-            break;
-          }
-        }
-        const unlockedWordCount = Math.min(maxUnlockedStage * QUESTIONS_PER_STAGE, pool.length);
-        return pool.slice(0, unlockedWordCount);
+        return [...pool];
       }
 
       function getDailyFixedWords() {

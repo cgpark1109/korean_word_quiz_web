@@ -381,7 +381,7 @@
       <div class="mission-card">
         <div class="mission-title">Daily Mission</div>
         <div class="mission-meta" id="attendanceMeta">
-          Check in and solve your daily 3 words.
+          Check in and solve your daily 10 questions.
         </div>
         <div class="mission-row">
           <button class="mission-btn" type="button" id="attendanceBtn">
@@ -390,14 +390,14 @@
           <a
             class="mission-btn primary"
             id="dailyThreeBtn"
-            href="quiz.html?level=beginner&mode=daily&daily=1&count=3&source=home"
+            href="quiz.html?level=beginner&mode=daily&daily=1&count=10&source=home"
             style="
               text-decoration: none;
               display: flex;
               align-items: center;
               justify-content: center;
             "
-            >Daily 3 Words</a
+            >Daily 10 Questions</a
           >
         </div>
       </div>
@@ -499,7 +499,7 @@
 
         dailyThreeBtn.addEventListener("click", (event) => {
           event.preventDefault();
-          trackEvent("daily3_started");
+          trackEvent("daily10_started");
           startDailyQuiz(
             localStorage.getItem("home_daily_level") || "beginner",
             WEB_VERSION,

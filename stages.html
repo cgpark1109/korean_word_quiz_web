@@ -156,7 +156,7 @@
       target.searchParams.set('level', level);
       target.searchParams.set('mode', 'daily');
       target.searchParams.set('daily', '1');
-      target.searchParams.set('count', '3');
+      target.searchParams.set('count', String(DAILY_QUESTION_COUNT));
       target.searchParams.set('source', 'home');
       target.searchParams.set('v', version);
       location.replace(target.toString());
@@ -221,7 +221,7 @@
     document.getElementById('streakMeta').textContent =
       streak.current > 0
         ? `Current streak ${formatDayCount(streak.current)} · Best ${formatDayCount(streak.best)}`
-        : 'Use Daily 3 from Home to start your streak';
+        : 'Use Daily 10 from Home to start your streak';
 
     const backUrl = new URL('index.html', location.href);
     backUrl.searchParams.set('v', WEB_VERSION);

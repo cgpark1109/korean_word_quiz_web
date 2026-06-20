@@ -78,6 +78,7 @@ function removeReviewWord(level, wordId) {
 }
 
 const STAGE_LEVELS = ['beginner', 'intermediate', 'advanced', 'expert'];
+const DAILY_QUESTION_COUNT = 10;
 
 function normalizeStageLevel(level) {
   return STAGE_LEVELS.includes(level) ? level : null;
@@ -176,7 +177,7 @@ function buildDailyQuizUrl(level, webVersion) {
   target.searchParams.set('level', safeLevel);
   target.searchParams.set('mode', 'daily');
   target.searchParams.set('daily', '1');
-  target.searchParams.set('count', '3');
+  target.searchParams.set('count', String(DAILY_QUESTION_COUNT));
   target.searchParams.set('source', 'home');
   target.searchParams.set('v', version);
   return target.toString();
