@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Daily Quiz Update",
-    "message": "Daily quiz is now 10 questions! Random words from the full level pool every day.",
+    "title": "Intermediate Reaches 30 Stages",
+    "message": "13 new Intermediate stages added! Intermediate now has 30 stages with 300 adjective and emotion words (10 questions each).",
     "button": "OK",
-    "version": "2026-06-20-daily"
+    "version": "2026-06-21-intermediate"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-intermediate-30-stages",
+      "revision": 1,
+      "active": true,
+      "title": "Intermediate Reaches 30 Stages",
+      "message": "13 new Intermediate stages added. Intermediate now has 30 stages with 300 words (10 questions each). Learn appearance words like \"잘생기다\" and \"화려하다\", thinking styles like \"논리적이다\" and \"창의적이다\", communication words like \"유머러스하다\" and \"직설적이다\", and emotions like \"황홀하다\" and \"긍정적이다\".",
+      "date": "2026-06-21",
+      "button": "OK"
+    },
     {
       "id": "2026-06-daily-10",
       "revision": 1,
