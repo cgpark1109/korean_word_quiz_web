@@ -1,20 +1,20 @@
 {
   "popup": {
     "active": true,
-    "title": "Intermediate Reaches 30 Stages",
-    "message": "13 new Intermediate stages added! Intermediate now has 30 stages with 300 adjective and emotion words (10 questions each).",
+    "title": "Advanced Reaches 30 Stages",
+    "message": "15 new Advanced stages added! Advanced now has 30 stages with 300 Korean proverbs (10 questions each).",
     "button": "OK",
-    "version": "2026-06-21-intermediate"
+    "version": "2026-06-22-advanced"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
     {
-      "id": "2026-06-intermediate-30-stages",
+      "id": "2026-06-advanced-30-stages",
       "revision": 1,
       "active": true,
-      "title": "Intermediate Reaches 30 Stages",
-      "message": "13 new Intermediate stages added. Intermediate now has 30 stages with 300 words (10 questions each). Learn appearance words like \"잘생기다\" and \"화려하다\", thinking styles like \"논리적이다\" and \"창의적이다\", communication words like \"유머러스하다\" and \"직설적이다\", and emotions like \"황홀하다\" and \"긍정적이다\".",
-      "date": "2026-06-21",
+      "title": "Advanced Reaches 30 Stages",
+      "message": "15 new Advanced stages added. Advanced now has 30 stages with 300 Korean proverbs (10 questions each). Practice idioms like \"말이 많으면 쓰다\", \"얻어농사\", and \"물 오른 통\".",
+      "date": "2026-06-22",
       "button": "OK"
     },
     {
