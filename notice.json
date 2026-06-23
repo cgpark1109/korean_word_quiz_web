@@ -1,13 +1,22 @@
 {
   "popup": {
     "active": true,
-    "title": "Advanced Reaches 30 Stages",
-    "message": "15 new Advanced stages added! Advanced now has 30 stages with 300 Korean proverbs (10 questions each).",
+    "title": "Expert Reaches 30 Stages",
+    "message": "14 new Expert stages added! Expert now has 30 stages with 300 Korean homophones (10 questions each).",
     "button": "OK",
-    "version": "2026-06-22-advanced"
+    "version": "2026-06-23-expert"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
+    {
+      "id": "2026-06-expert-30-stages",
+      "revision": 1,
+      "active": true,
+      "title": "Expert Reaches 30 Stages",
+      "message": "14 new Expert stages added. Expert now has 30 stages with 300 Korean homophones (10 questions each). Practice tricky words like \"가\" (price / to add), \"탈\" (escape / mask), and \"틈\" (gap / spare time).",
+      "date": "2026-06-23",
+      "button": "OK"
+    },
     {
       "id": "2026-06-advanced-30-stages",
       "revision": 1,
