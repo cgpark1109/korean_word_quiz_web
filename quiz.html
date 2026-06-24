@@ -347,7 +347,7 @@
   <script>
     (function bootQuizPage() {
       const WEB_VERSION =
-        new URLSearchParams(window.location.search).get('v') || '20260624-9';
+        new URLSearchParams(window.location.search).get('v') || '20260624-10';
 
       function showQuizError(message) {
         const grid = document.getElementById('choicesGrid');
@@ -431,7 +431,7 @@
         return;
       }
 
-      const questions = sourceWords;
+      const questions = shuffle([...fullPool]).slice(0, QUESTIONS_PER_QUIZ);
       TOTAL = questions.length;
       if (!TOTAL) {
         showQuizError('Failed to load questions.');
