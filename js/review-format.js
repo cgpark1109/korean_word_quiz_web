@@ -23,7 +23,7 @@ function correctReviewParticle(word, particle) {
 function stripDuplicateReviewSuffix(after, answer) {
   if (!after || !answer) return after;
   const hasLeadingSpace = after.startsWith(' ');
-  const trimmed = hasLeadingSpace ? after.trimStart() : after;
+  const trimmed = hasLeadingSpace ? after.replace(/^\s+/, '') : after;
   for (let len = Math.min(4, answer.length); len >= 1; len -= 1) {
     const suffix = answer.slice(-len);
     if (!trimmed.startsWith(suffix)) continue;
@@ -70,7 +70,7 @@ function buildFilledReviewSentence(korean, answer, reviewKorean) {
   }
 
   for (const particle of REVIEW_PARTICLE_TOKENS) {
-    const spaced = after.match(new RegExp(`^ (${particle})( .*)?$`, 's'));
+    const spaced = after.match(new RegExp(`^ (${particle})( ([\\s\\S]*))?$`));
     if (spaced) {
       const fixedParticle = correctReviewParticle(filledAnswer, spaced[1]);
       let text = before + filledAnswer + fixedParticle;
@@ -84,7 +84,7 @@ function buildFilledReviewSentence(korean, answer, reviewKorean) {
       };
     }
 
-    const glued = after.match(new RegExp(`^(${particle})( .*)?$`, 's'));
+    const glued = after.match(new RegExp(`^(${particle})( ([\\s\\S]*))?$`));
     if (glued) {
       const fixedParticle = correctReviewParticle(filledAnswer, glued[1]);
       let text = before + filledAnswer + fixedParticle;
@@ -99,7 +99,7 @@ function buildFilledReviewSentence(korean, answer, reviewKorean) {
     }
   }
 
-  const contentMatch = after.match(/^ (\S+)(.*)$/s);
+  const contentMatch = after.match(/^ (\S+)([\s\S]*)$/);
   if (contentMatch) {
     const text = normalizeReviewSpacing(
       before + filledAnswer + ' ' + contentMatch[1] + contentMatch[2],
@@ -116,7 +116,8 @@ function buildFilledReviewSentence(korean, answer, reviewKorean) {
   return { text, before, answer: filledAnswer, after };
 }
 
-function buildReviewWordSummary(word, level, options = {}) {
+function buildReviewWordSummary(word, level, options) {
+  options = options || {};
   if (!word) return { primary: '', secondary: '' };
 
   let secondary = word.english || '';

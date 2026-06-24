@@ -90,8 +90,8 @@
       background: var(--card-bg);
     }
   </style>
-  <script src="./js/review-format.js?v=20260624-12"></script>
-  <script src="./js/app.js?v=20260624-12"></script>
+  <script src="./js/app.js?v=20260624-13"></script>
+  <script src="./js/review-format.js?v=20260624-13"></script>
 </head>
 <body class="words-page">
   <div class="top-bar">
@@ -105,7 +105,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260624-12';
+      new URLSearchParams(window.location.search).get('v') || '20260624-13';
     const listType =
       new URLSearchParams(window.location.search).get('type') === 'learned'
         ? 'learned'
@@ -128,9 +128,23 @@
         ? 'Correct answers — view only'
         : 'Missed words — view only';
 
+    function getWordSummary(word, level, options) {
+      options = options || {};
+      if (typeof buildReviewWordSummary === 'function') {
+        return buildReviewWordSummary(word, level, options);
+      }
+      if (typeof formatWordSummary === 'function') {
+        return formatWordSummary(word, level, options);
+      }
+      return {
+        primary: (word && word.korean) || '',
+        secondary: (word && word.english) || '',
+      };
+    }
+
     function renderPrimaryLine(container, summary) {
       const parts = summary.primaryParts;
-      if (parts?.emphasize) {
+      if (parts && parts.emphasize) {
         container.append(document.createTextNode(parts.before));
         const answerEl = document.createElement('strong');
         answerEl.className = 'word-answer';
@@ -145,7 +159,7 @@
     function renderWordItem(entry, word) {
       const el = document.createElement('article');
       el.className = 'word-item';
-      const summary = buildReviewWordSummary(word, entry.level, {
+      const summary = getWordSummary(word, entry.level, {
         emphasizeAnswer: listType === 'wrong',
       });
       const levelLabel = LEVEL_DISPLAY_NAMES[entry.level] || entry.level;
@@ -173,6 +187,10 @@
       list.innerHTML = '';
 
       try {
+        if (typeof loadAllWordPools !== 'function') {
+          throw new Error('App script is not loaded.');
+        }
+
         const pools = await loadAllWordPools(WEB_VERSION);
         const entries = getAllSavedWordEntries(listType);
         const items = entries
@@ -183,6 +201,9 @@
           .filter(Boolean);
 
         if (!items.length) {
+          empty.textContent = entries.length
+            ? 'Saved words could not be matched to the word list.'
+            : 'No words saved yet.';
           empty.style.display = 'block';
           return;
         }
@@ -192,6 +213,7 @@
           list.appendChild(renderWordItem(entry, word));
         });
       } catch (e) {
+        console.error('loadWordsPage failed', e);
         empty.textContent = 'Failed to load saved words.';
         empty.style.display = 'block';
       }
