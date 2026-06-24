@@ -90,7 +90,8 @@
       background: var(--card-bg);
     }
   </style>
-  <script src="./js/app.js?v=20260624-11"></script>
+  <script src="./js/review-format.js?v=20260624-12"></script>
+  <script src="./js/app.js?v=20260624-12"></script>
 </head>
 <body class="words-page">
   <div class="top-bar">
@@ -104,7 +105,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260624-9';
+      new URLSearchParams(window.location.search).get('v') || '20260624-12';
     const listType =
       new URLSearchParams(window.location.search).get('type') === 'learned'
         ? 'learned'
@@ -144,7 +145,7 @@
     function renderWordItem(entry, word) {
       const el = document.createElement('article');
       el.className = 'word-item';
-      const summary = formatWordSummary(word, entry.level, {
+      const summary = buildReviewWordSummary(word, entry.level, {
         emphasizeAnswer: listType === 'wrong',
       });
       const levelLabel = LEVEL_DISPLAY_NAMES[entry.level] || entry.level;
