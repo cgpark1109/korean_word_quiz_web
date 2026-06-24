@@ -269,7 +269,7 @@
       }
     }
   </style>
-  <script src="./js/app.js?v=20260603-5"></script>
+  <script src="./js/app.js?v=20260624-1"></script>
 </head>
 <body class="quiz-page">
   <header class="quiz-header">
@@ -845,6 +845,9 @@
       }
 
       document.getElementById('nextBtn').addEventListener('click', () => {
+        if (mode === 'daily') {
+          setDailyAnsweredCount(level, current + 1);
+        }
         current++;
         if (current >= TOTAL) {
           const query = new URLSearchParams({

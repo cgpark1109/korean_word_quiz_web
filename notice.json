@@ -1,6 +1,6 @@
 {
   "popup": {
-    "active": true,
+    "active": false,
     "title": "Expert Reaches 30 Stages",
     "message": "14 new Expert stages added! Expert now has 30 stages with 300 Korean homophones (10 questions each).",
     "button": "OK",

@@ -79,6 +79,31 @@ function removeReviewWord(level, wordId) {
 
 const STAGE_LEVELS = ['beginner', 'intermediate', 'advanced', 'expert'];
 const DAILY_QUESTION_COUNT = 10;
+const QUESTIONS_PER_STAGE = 10;
+const LEVEL_WORD_COUNTS = {
+  beginner: 300,
+  intermediate: 300,
+  advanced: 300,
+  expert: 300,
+};
+const LEVEL_DISPLAY_NAMES = {
+  beginner: 'Beginner',
+  intermediate: 'Intermediate',
+  advanced: 'Advanced',
+  expert: 'Expert',
+};
+const LEVEL_DESCRIPTIONS = {
+  beginner: 'Common everyday words',
+  intermediate: 'Verbs, adjectives and expressions',
+  advanced: 'Korean proverbs',
+  expert: 'Homophones and tricky words',
+};
+const LEVEL_ITEM_LABELS = {
+  beginner: 'items',
+  intermediate: 'items',
+  advanced: 'proverbs',
+  expert: 'homophones',
+};
 
 function normalizeStageLevel(level) {
   return STAGE_LEVELS.includes(level) ? level : null;
@@ -166,6 +191,147 @@ function getAttendanceStatus() {
     streak: parseInt(localStorage.getItem('attendance_streak') || '0', 10) || 0,
     best: parseInt(localStorage.getItem('attendance_best') || '0', 10) || 0,
     total: parseInt(localStorage.getItem('attendance_total') || '0', 10) || 0,
+  };
+}
+
+function isReturningUser() {
+  if (localStorage.getItem('attendance_last_date')) return true;
+  if (localStorage.getItem('last_played_date')) return true;
+  if (parseInt(localStorage.getItem('event_count_quiz_completed') || '0', 10) > 0) {
+    return true;
+  }
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('stage_cleared_') && localStorage.getItem(key) === 'true') {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasPlayHistory() {
+  if (localStorage.getItem('last_played_date')) return true;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('stage_cleared_') && localStorage.getItem(key) === 'true') {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getDailyCompletedKey(date = getLocalDateKey()) {
+  return `daily_completed_${date}`;
+}
+
+function isDailyCompletedToday() {
+  return localStorage.getItem(getDailyCompletedKey()) === 'true';
+}
+
+function markDailyCompletedToday() {
+  localStorage.setItem(getDailyCompletedKey(), 'true');
+}
+
+function getDailyAnsweredKey(level, date = getLocalDateKey()) {
+  const safeLevel = normalizeStageLevel(level) || 'beginner';
+  return `daily_answered_${safeLevel}_${date}`;
+}
+
+function getDailyAnsweredCount(level) {
+  return parseInt(localStorage.getItem(getDailyAnsweredKey(level)) || '0', 10) || 0;
+}
+
+function setDailyAnsweredCount(level, count) {
+  const safe = Math.max(0, Math.min(DAILY_QUESTION_COUNT, count));
+  localStorage.setItem(getDailyAnsweredKey(level), String(safe));
+}
+
+function getDailyChallengeStatus(level) {
+  const preferredLevel =
+    normalizeStageLevel(level) || localStorage.getItem('home_daily_level') || 'beginner';
+  const completed = isDailyCompletedToday();
+  const answered = getDailyAnsweredCount(preferredLevel);
+  const attendance = getAttendanceStatus();
+  return {
+    level: preferredLevel,
+    completed,
+    answered,
+    inProgress: !completed && answered > 0,
+    streak: attendance.streak,
+    best: attendance.best,
+  };
+}
+
+function getTotalStagesForLevel(level) {
+  const safeLevel = normalizeStageLevel(level) || 'beginner';
+  const count = LEVEL_WORD_COUNTS[safeLevel] || 30;
+  return Math.ceil(count / QUESTIONS_PER_STAGE);
+}
+
+function isStageUnlocked(level, stageNumber) {
+  if (stageNumber === 1) return true;
+  return localStorage.getItem(`stage_cleared_${level}_${stageNumber - 1}`) === 'true';
+}
+
+function isStageCleared(level, stageNumber) {
+  return localStorage.getItem(`stage_cleared_${level}_${stageNumber}`) === 'true';
+}
+
+function getLevelMetaLine(level) {
+  const safeLevel = normalizeStageLevel(level);
+  if (!safeLevel) return '';
+  const totalWords = LEVEL_WORD_COUNTS[safeLevel] || 30;
+  const totalStages = getTotalStagesForLevel(safeLevel);
+  const itemLabel = LEVEL_ITEM_LABELS[safeLevel] || 'items';
+  return `${totalWords} ${itemLabel} · ${totalStages} stages`;
+}
+
+function buildFirstQuizTarget(webVersion) {
+  const version =
+    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-1';
+  const url = new URL('quiz.html', location.href);
+  url.searchParams.set('level', 'beginner');
+  url.searchParams.set('stage', '1');
+  url.searchParams.set('v', version);
+  return {
+    url: url.toString(),
+    label: 'Beginner · Stage 1',
+  };
+}
+
+function resolveContinueTarget(webVersion) {
+  const version =
+    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-1';
+  const level = resolveStageLevel();
+  const totalStages = getTotalStagesForLevel(level);
+
+  for (let n = 1; n <= totalStages; n++) {
+    if (isStageUnlocked(level, n) && !isStageCleared(level, n)) {
+      const url = new URL('quiz.html', location.href);
+      url.searchParams.set('level', level);
+      url.searchParams.set('stage', String(n));
+      url.searchParams.set('v', version);
+      return {
+        level,
+        stage: n,
+        totalStages,
+        label: `${LEVEL_DISPLAY_NAMES[level]} · Stage ${n}`,
+        url: url.toString(),
+        type: 'quiz',
+      };
+    }
+  }
+
+  const stagesUrl = new URL('stages.html', location.href);
+  stagesUrl.searchParams.set('level', level);
+  stagesUrl.searchParams.set('v', version);
+  return {
+    level,
+    stage: null,
+    totalStages,
+    label: `${LEVEL_DISPLAY_NAMES[level]} · Stage ${totalStages}`,
+    url: stagesUrl.toString(),
+    type: 'stages',
   };
 }
 
@@ -281,6 +447,12 @@ async function loadNotice() {
     const res = await fetch('./notice.json?v=' + encodeURIComponent(version));
     const data = await res.json();
 
+    if (data.banner?.active) showBanner(data.banner);
+
+    if (!isReturningUser()) {
+      return;
+    }
+
     const latest = getLatestNotice(data);
     if (latest && !hasSeenNotice(latest)) {
       showNoticePopup(latest);
@@ -288,8 +460,6 @@ async function loadNotice() {
       const seen = localStorage.getItem('notice_' + data.popup.version);
       if (!seen) showLegacyPopup(data.popup);
     }
-
-    if (data.banner?.active) showBanner(data.banner);
   } catch (e) {}
 }
 
