@@ -5,10 +5,16 @@
     inAppWebViewReady = true;
   });
 
+  function isInAppWebView() {
+    return (
+      inAppWebViewReady ||
+      typeof window.flutter_inappwebview !== 'undefined' ||
+      location.protocol === 'file:'
+    );
+  }
+
   function showAppOnlyScreen() {
-    if (inAppWebViewReady || typeof window.flutter_inappwebview !== 'undefined') {
-      return;
-    }
+    if (isInAppWebView()) return;
 
     document.body.innerHTML = `
       <div style="display:flex;flex-direction:column;
@@ -25,12 +31,12 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    if (inAppWebViewReady || typeof window.flutter_inappwebview !== 'undefined') {
-      return;
-    }
+    if (isInAppWebView()) return;
 
-    // Android WebView can expose the bridge slightly after DOMContentLoaded.
-    window.setTimeout(showAppOnlyScreen, 800);
+    window.setTimeout(() => {
+      if (isInAppWebView()) return;
+      showAppOnlyScreen();
+    }, 2000);
   });
 })();
 
@@ -75,6 +81,148 @@ function removeReviewWord(level, wordId) {
   const ids = getReviewWordIds(level).filter(id => id !== wordId);
   saveReviewWordIds(level, ids);
   return ids.length;
+}
+
+function getLearnedWordIds(level) {
+  const list = getJsonStorage(`learned_${level}`, []);
+  return Array.isArray(list) ? list : [];
+}
+
+function saveLearnedWordIds(level, ids) {
+  const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
+  setJsonStorage(`learned_${level}`, uniqueIds);
+}
+
+function addLearnedWord(level, wordId) {
+  const ids = getLearnedWordIds(level);
+  if (ids.includes(wordId)) return ids.length;
+  ids.push(wordId);
+  saveLearnedWordIds(level, ids);
+  return ids.length;
+}
+
+function removeLearnedWord(level, wordId) {
+  const ids = getLearnedWordIds(level).filter(id => id !== wordId);
+  saveLearnedWordIds(level, ids);
+  return ids.length;
+}
+
+function getWordId(word) {
+  if (!word || typeof word !== 'object') return '';
+  if (word.korean && word.english) return `${word.korean}__${word.english}`;
+  if (word.korean && word.answer) return `${word.korean}__${word.answer}`;
+  if (word.korean && Array.isArray(word.meanings)) return `${word.korean}__expert`;
+  return JSON.stringify(word);
+}
+
+function formatWordSummary(word, level) {
+  const safeLevel = normalizeStageLevel(level);
+  if (!word) return { primary: '', secondary: '' };
+  if (safeLevel === 'advanced') {
+    return { primary: word.korean || '', secondary: word.english || '' };
+  }
+  if (safeLevel === 'expert') {
+    const meanings = (word.meanings || []).map(item => item.english).filter(Boolean);
+    return { primary: word.korean || '', secondary: meanings.join(' · ') };
+  }
+  return { primary: word.korean || '', secondary: word.english || '' };
+}
+
+function countAllReviewWords() {
+  return STAGE_LEVELS.reduce((sum, level) => sum + getReviewWordIds(level).length, 0);
+}
+
+function countAllLearnedWords() {
+  return STAGE_LEVELS.reduce((sum, level) => sum + getLearnedWordIds(level).length, 0);
+}
+
+function getAllSavedWordEntries(listType) {
+  const entries = [];
+  const getter = listType === 'learned' ? getLearnedWordIds : getReviewWordIds;
+  STAGE_LEVELS.forEach(level => {
+    getter(level).forEach(wordId => {
+      entries.push({ level, wordId });
+    });
+  });
+  return entries;
+}
+
+function loadScriptOnce(src) {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[data-src="${src}"]`);
+    if (existing) {
+      if (existing.dataset.loaded === 'true') {
+        resolve();
+        return;
+      }
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)));
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = src;
+    script.dataset.src = src;
+    script.onload = () => {
+      script.dataset.loaded = 'true';
+      resolve();
+    };
+    script.onerror = () => reject(new Error(`Failed to load ${src}`));
+    document.head.appendChild(script);
+  });
+}
+
+async function loadAllWordPools(webVersion) {
+  const version =
+    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-9';
+  const pools = {};
+
+  for (const level of STAGE_LEVELS) {
+    await loadScriptOnce(`./js/word-data-${level}.js?v=${encodeURIComponent(version)}`);
+    const chunk = window.WordData && window.WordData[level];
+    pools[level] = Array.isArray(chunk) ? [...chunk] : [];
+  }
+
+  return pools;
+}
+
+function findWordInPools(poolsByLevel, level, wordId) {
+  const pool = poolsByLevel[level] || [];
+  return pool.find(word => getWordId(word) === wordId) || null;
+}
+
+function buildRandomQuizUrl(webVersion) {
+  const version =
+    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-9';
+  const target = new URL('quiz.html', location.href);
+  target.searchParams.set('mode', 'random');
+  target.searchParams.set('v', version);
+  return target.toString();
+}
+
+function buildWordsListUrl(listType, webVersion) {
+  const version =
+    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-9';
+  const target = new URL('words.html', location.href);
+  target.searchParams.set('type', listType === 'learned' ? 'learned' : 'wrong');
+  target.searchParams.set('v', version);
+  return target.toString();
+}
+
+function buildHomeUrl(webVersion) {
+  const version =
+    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-9';
+  const target = new URL('index.html', location.href);
+  target.searchParams.set('v', version);
+  return target.toString();
+}
+
+function buildStageQuizUrl(level, stage, webVersion) {
+  return buildRandomQuizUrl(webVersion);
+}
+
+function buildReviewQuizUrl(level, reviewType, webVersion) {
+  return buildWordsListUrl(reviewType === 'learned' ? 'learned' : 'wrong', webVersion);
 }
 
 const STAGE_LEVELS = ['beginner', 'intermediate', 'advanced', 'expert'];
@@ -287,51 +435,18 @@ function getLevelMetaLine(level) {
 }
 
 function buildFirstQuizTarget(webVersion) {
-  const version =
-    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-1';
-  const url = new URL('quiz.html', location.href);
-  url.searchParams.set('level', 'beginner');
-  url.searchParams.set('stage', '1');
-  url.searchParams.set('v', version);
   return {
-    url: url.toString(),
-    label: 'Beginner · Stage 1',
+    url: buildRandomQuizUrl(webVersion),
+    label: '10 random words · All levels',
   };
 }
 
 function resolveContinueTarget(webVersion) {
-  const version =
-    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-1';
-  const level = resolveStageLevel();
-  const totalStages = getTotalStagesForLevel(level);
-
-  for (let n = 1; n <= totalStages; n++) {
-    if (isStageUnlocked(level, n) && !isStageCleared(level, n)) {
-      const url = new URL('quiz.html', location.href);
-      url.searchParams.set('level', level);
-      url.searchParams.set('stage', String(n));
-      url.searchParams.set('v', version);
-      return {
-        level,
-        stage: n,
-        totalStages,
-        label: `${LEVEL_DISPLAY_NAMES[level]} · Stage ${n}`,
-        url: url.toString(),
-        type: 'quiz',
-      };
-    }
-  }
-
-  const stagesUrl = new URL('stages.html', location.href);
-  stagesUrl.searchParams.set('level', level);
-  stagesUrl.searchParams.set('v', version);
   return {
-    level,
-    stage: null,
-    totalStages,
-    label: `${LEVEL_DISPLAY_NAMES[level]} · Stage ${totalStages}`,
-    url: stagesUrl.toString(),
-    type: 'stages',
+    level: resolveStageLevel(),
+    label: '10 random words · All levels',
+    url: buildRandomQuizUrl(webVersion),
+    type: 'quiz',
   };
 }
 
@@ -421,6 +536,21 @@ function getLatestNotice(data) {
   })[0];
 }
 
+function formatNoticeSummary(notice) {
+  if (!notice) return 'Notice';
+  const title = String(notice.title || '').trim();
+  const message = String(notice.message || '').trim();
+  if (title) return title;
+  return message || 'Notice';
+}
+
+function formatNoticeDetail(notice) {
+  const title = String(notice?.title || '').trim();
+  const message = String(notice?.message || '').trim();
+  if (!message || message === title) return '';
+  return message;
+}
+
 function getNoticeSeenKey(notice) {
   const revision = parseInt(notice.revision, 10) || 1;
   return `notice_seen_${notice.id}_r${revision}`;
@@ -440,18 +570,31 @@ function removeNoticePopups() {
   document.querySelectorAll('.notice-popup-overlay').forEach(el => el.remove());
 }
 
+async function fetchBundledJson(relativePath, webVersion) {
+  const cleanPath = String(relativePath || '').replace(/^\.\//, '');
+  const version =
+    webVersion || new URLSearchParams(window.location.search).get('v') || '20260624-8';
+
+  try {
+    const res = await fetch(`./${cleanPath}?v=${encodeURIComponent(version)}`);
+    if (res.ok) return await res.json();
+  } catch (e) {}
+
+  const result = await notifyApp('readAsset', { path: cleanPath });
+  if (result?.ok && typeof result.data === 'string') {
+    return JSON.parse(result.data);
+  }
+
+  throw new Error(`Failed to load ${cleanPath}`);
+}
+
 async function loadNotice() {
   try {
     const version =
-      new URLSearchParams(window.location.search).get('v') || '20260528-1';
-    const res = await fetch('./notice.json?v=' + encodeURIComponent(version));
-    const data = await res.json();
+      new URLSearchParams(window.location.search).get('v') || '20260624-8';
+    const data = await fetchBundledJson('notice.json', version);
 
     if (data.banner?.active) showBanner(data.banner);
-
-    if (!isReturningUser()) {
-      return;
-    }
 
     const latest = getLatestNotice(data);
     if (latest && !hasSeenNotice(latest)) {
@@ -525,7 +668,7 @@ function showNoticePopup(notice, options = {}) {
 
   const title = document.createElement('h3');
   title.className = 'notice-popup-title';
-  title.textContent = notice.title || 'Notice';
+  title.textContent = formatNoticeSummary(notice);
   card.appendChild(title);
 
   if (notice.date) {
@@ -535,10 +678,13 @@ function showNoticePopup(notice, options = {}) {
     card.appendChild(dateEl);
   }
 
-  const message = document.createElement('p');
-  message.className = 'notice-popup-message';
-  message.textContent = notice.message || '';
-  card.appendChild(message);
+  const detail = formatNoticeDetail(notice);
+  if (detail) {
+    const message = document.createElement('p');
+    message.className = 'notice-popup-message';
+    message.textContent = detail;
+    card.appendChild(message);
+  }
 
   const btn = document.createElement('button');
   btn.type = 'button';
@@ -594,4 +740,147 @@ function showBanner(b) {
       style="background:none;border:none;color:#9B8B7A;
       font-size:16px;cursor:pointer;">✕</button>`;
   document.body.prepend(el);
+}
+
+function updateDailyProgressBar(answered, total, completed) {
+  const fill = document.getElementById('dailyProgressFill');
+  if (!fill) return;
+  const safeTotal = total || DAILY_QUESTION_COUNT || 10;
+  const ratio = completed ? 1 : Math.max(0, Math.min(1, answered / safeTotal));
+  fill.style.width = `${Math.round(ratio * 100)}%`;
+}
+
+function formatDayCount(count) {
+  return `${count} ${count === 1 ? 'day' : 'days'}`;
+}
+
+function getHomeWebVersion() {
+  return new URLSearchParams(window.location.search).get('v') || '20260624-9';
+}
+
+function initHomePage() {
+  const webVersion = getHomeWebVersion();
+
+  const heroTitle = document.getElementById('heroTitle');
+  const heroDesc = document.getElementById('heroDesc');
+  const heroBtn = document.getElementById('heroBtn');
+  try {
+    loadNotice();
+    if (localStorage.getItem('first_open_tracked') !== 'true') {
+      trackEvent('first_open');
+    }
+  } catch (e) {}
+
+  function renderReviewSection() {
+    const wrongCount = countAllReviewWords();
+    const learnedCount = countAllLearnedWords();
+
+    const wrongMeta = document.getElementById('reviewWrongMeta');
+    const learnedMeta = document.getElementById('reviewLearnedMeta');
+    const wrongLink = document.getElementById('reviewWrongLink');
+    const learnedLink = document.getElementById('reviewLearnedLink');
+    const reviewLevelLabel = document.getElementById('reviewLevelLabel');
+
+    if (reviewLevelLabel) {
+      reviewLevelLabel.textContent = 'All levels · tap to view words';
+    }
+    if (wrongMeta) {
+      wrongMeta.textContent =
+        wrongCount > 0
+          ? `${wrongCount} saved word${wrongCount === 1 ? '' : 's'}`
+          : 'No wrong answers yet';
+    }
+    if (learnedMeta) {
+      learnedMeta.textContent =
+        learnedCount > 0
+          ? `${learnedCount} saved word${learnedCount === 1 ? '' : 's'}`
+          : 'No learned words yet';
+    }
+
+    if (wrongLink) {
+      if (wrongCount > 0) {
+        wrongLink.href = buildWordsListUrl('wrong', webVersion);
+        wrongLink.classList.remove('is-disabled');
+        wrongLink.removeAttribute('aria-disabled');
+        wrongLink.onclick = null;
+      } else {
+        wrongLink.href = '#';
+        wrongLink.classList.add('is-disabled');
+        wrongLink.setAttribute('aria-disabled', 'true');
+        wrongLink.onclick = event => event.preventDefault();
+      }
+    }
+
+    if (learnedLink) {
+      if (learnedCount > 0) {
+        learnedLink.href = buildWordsListUrl('learned', webVersion);
+        learnedLink.classList.remove('is-disabled');
+        learnedLink.removeAttribute('aria-disabled');
+        learnedLink.onclick = null;
+      } else {
+        learnedLink.href = '#';
+        learnedLink.classList.add('is-disabled');
+        learnedLink.setAttribute('aria-disabled', 'true');
+        learnedLink.onclick = event => event.preventDefault();
+      }
+    }
+  }
+
+  function renderHeroCard() {
+    if (!heroTitle || !heroDesc || !heroBtn) return;
+
+    const quizTarget = buildFirstQuizTarget(webVersion);
+
+    if (!hasPlayHistory()) {
+      heroTitle.textContent = 'Start Your First Quiz';
+      heroDesc.textContent = quizTarget.label;
+      heroBtn.textContent = 'Start Quiz';
+    } else {
+      heroTitle.textContent = 'Continue Learning';
+      heroDesc.textContent = quizTarget.label;
+      heroBtn.textContent = 'Play Again';
+    }
+
+    heroBtn.setAttribute('href', quizTarget.url);
+    heroBtn.onclick = event => {
+      event.preventDefault();
+      location.href = quizTarget.url;
+    };
+  }
+
+  try {
+    renderHeroCard();
+    renderReviewSection();
+  } catch (e) {}
+
+  const settingsLink = document.getElementById('settingsLink');
+  if (settingsLink) {
+    const settingsUrl = new URL('settings.html', location.href);
+    settingsUrl.searchParams.set('v', webVersion);
+    settingsLink.href = settingsUrl.toString();
+  }
+
+  const noticeLink = document.getElementById('noticeLink');
+  if (noticeLink) {
+    const noticeUrl = new URL('notice.html', location.href);
+    noticeUrl.searchParams.set('v', webVersion);
+    noticeLink.href = noticeUrl.toString();
+  }
+
+  const moreAppsLink = document.getElementById('moreAppsLink');
+  if (moreAppsLink) {
+    moreAppsLink.href = buildMoreAppsUrl(webVersion);
+    moreAppsLink.addEventListener('click', () => trackEvent('more_apps_opened'));
+  }
+}
+
+function scheduleHomePageInit() {
+  if (!document.body?.classList.contains('home-page')) return;
+  initHomePage();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', scheduleHomePageInit);
+} else {
+  scheduleHomePageInit();
 }

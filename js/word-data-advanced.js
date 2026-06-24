@@ -1,6 +1,6 @@
 // Quiz type: proverb with ___ blank displayed → choose the missing word (4-choice)
 // English meaning shown as subtitle; hint shown in feedback after answering.
-const WordData = {
+var WordData = {
   advanced: [
     { korean: '하늘의 ___ 따기', english: 'As hard as picking stars from the sky', answer: '별', hint: 'Nearly impossible task' },
     { korean: '가는 말이 고와야 ___ 말이 곱다', english: 'Treat others as you wish to be treated', answer: '오는', hint: 'How you speak to others determines how they speak to you' },

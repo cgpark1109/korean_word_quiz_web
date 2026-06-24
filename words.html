@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Your Words – Korean Word Quiz</title>
+  <link rel="stylesheet" href="./css/base.css?v=20260624-9">
+  <style>
+    body.words-page {
+      min-height: 100dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 8px;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px 4px;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 2px;
+      text-decoration: none;
+      line-height: 1;
+    }
+    .page-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .page-intro {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      padding: 0 16px 8px;
+      margin: 0;
+    }
+    .word-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 16px 12px;
+    }
+    .word-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card-bg);
+      padding: 10px 12px;
+    }
+    .word-level {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .word-primary {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin-bottom: 2px;
+    }
+    .word-secondary {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    .empty-text {
+      margin: 8px 16px 12px;
+      padding: 14px 12px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.5;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card-bg);
+    }
+  </style>
+  <script src="./js/app.js?v=20260624-9"></script>
+</head>
+<body class="words-page">
+  <div class="top-bar">
+    <a class="back-btn" id="backBtn" href="index.html">←</a>
+    <div class="page-title" id="pageTitle">Your Words</div>
+  </div>
+  <p class="page-intro" id="pageIntro"></p>
+
+  <div class="word-list" id="wordList"></div>
+  <div class="empty-text" id="emptyText" style="display:none;">No words saved yet.</div>
+
+  <script>
+    const WEB_VERSION =
+      new URLSearchParams(window.location.search).get('v') || '20260624-9';
+    const listType =
+      new URLSearchParams(window.location.search).get('type') === 'learned'
+        ? 'learned'
+        : 'wrong';
+    const LEVEL_ICONS = {
+      beginner: '🌱',
+      intermediate: '🌿',
+      advanced: '🌳',
+      expert: '⭐',
+    };
+
+    const backUrl = new URL('index.html', location.href);
+    backUrl.searchParams.set('v', WEB_VERSION);
+    document.getElementById('backBtn').href = backUrl.toString();
+
+    document.getElementById('pageTitle').textContent =
+      listType === 'learned' ? 'Learned Words' : 'Wrong Answers';
+    document.getElementById('pageIntro').textContent =
+      listType === 'learned'
+        ? 'Correct answers — view only'
+        : 'Missed words — view only';
+
+    function renderWordItem(entry, word) {
+      const el = document.createElement('article');
+      el.className = 'word-item';
+      const summary = formatWordSummary(word, entry.level);
+      const levelLabel = LEVEL_DISPLAY_NAMES[entry.level] || entry.level;
+      el.innerHTML = `
+        <div class="word-level">${LEVEL_ICONS[entry.level] || ''} ${levelLabel}</div>
+        <div class="word-primary">${summary.primary}</div>
+        <div class="word-secondary">${summary.secondary}</div>
+      `;
+      return el;
+    }
+
+    async function loadWordsPage() {
+      const list = document.getElementById('wordList');
+      const empty = document.getElementById('emptyText');
+      list.innerHTML = '';
+
+      try {
+        const pools = await loadAllWordPools(WEB_VERSION);
+        const entries = getAllSavedWordEntries(listType);
+        const items = entries
+          .map(entry => {
+            const word = findWordInPools(pools, entry.level, entry.wordId);
+            return word ? { entry, word } : null;
+          })
+          .filter(Boolean);
+
+        if (!items.length) {
+          empty.style.display = 'block';
+          return;
+        }
+
+        empty.style.display = 'none';
+        items.forEach(({ entry, word }) => {
+          list.appendChild(renderWordItem(entry, word));
+        });
+      } catch (e) {
+        empty.textContent = 'Failed to load saved words.';
+        empty.style.display = 'block';
+      }
+    }
+
+    loadWordsPage();
+  </script>
+</body>
+</html>

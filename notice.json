@@ -1,163 +1,154 @@
 {
   "popup": {
     "active": false,
-    "title": "Expert Reaches 30 Stages",
-    "message": "14 new Expert stages added! Expert now has 30 stages with 300 Korean homophones (10 questions each).",
+    "title": "Expert · +140 words",
+    "message": "Expert · +140 words",
     "button": "OK",
     "version": "2026-06-23-expert"
   },
   "banner": { "active": false, "message": "" },
   "notices": [
     {
-      "id": "2026-06-expert-30-stages",
+      "id": "2026-06-24-random-quiz",
       "revision": 1,
       "active": true,
-      "title": "Expert Reaches 30 Stages",
-      "message": "14 new Expert stages added. Expert now has 30 stages with 300 Korean homophones (10 questions each). Practice tricky words like \"가\" (price / to add), \"탈\" (escape / mask), and \"틈\" (gap / spare time).",
+      "title": "Quiz · 10 random words from all levels",
+      "message": "",
+      "date": "2026-06-24",
+      "button": "OK"
+    },
+    {
+      "id": "2026-06-24-word-list",
+      "revision": 1,
+      "active": true,
+      "title": "Saved words · view wrong / learned lists",
+      "message": "",
+      "date": "2026-06-24",
+      "button": "OK"
+    },
+    {
+      "id": "2026-06-expert-30-stages",
+      "revision": 2,
+      "active": true,
+      "title": "Expert · +140 words",
+      "message": "",
       "date": "2026-06-23",
       "button": "OK"
     },
     {
       "id": "2026-06-advanced-30-stages",
+      "revision": 2,
+      "active": true,
+      "title": "Advanced · +150 proverbs",
+      "message": "",
+      "date": "2026-06-22",
+      "button": "OK"
+    },
+    {
+      "id": "2026-06-intermediate-30-stages",
       "revision": 1,
       "active": true,
-      "title": "Advanced Reaches 30 Stages",
-      "message": "15 new Advanced stages added. Advanced now has 30 stages with 300 Korean proverbs (10 questions each). Practice idioms like \"말이 많으면 쓰다\", \"얻어농사\", and \"물 오른 통\".",
-      "date": "2026-06-22",
+      "title": "Intermediate · +150 words",
+      "message": "",
+      "date": "2026-06-21",
+      "button": "OK"
+    },
+    {
+      "id": "2026-06-beginner-30-stages",
+      "revision": 2,
+      "active": true,
+      "title": "Beginner · +70 words",
+      "message": "",
+      "date": "2026-06-20",
       "button": "OK"
     },
     {
       "id": "2026-06-daily-10",
       "revision": 1,
-      "active": true,
-      "title": "Daily 10 Questions",
-      "message": "Daily quiz now has 10 questions (up from 3). Each day, 10 random words are picked from the full word pool of your current level — all stages included.",
-      "date": "2026-06-20",
-      "button": "OK"
-    },
-    {
-      "id": "2026-06-beginner-30-stages",
-      "revision": 1,
-      "active": true,
-      "title": "Beginner Reaches 30 Stages",
-      "message": "7 new Beginner stages added. Beginner now has 30 stages with 300 words (10 questions each). Learn kitchen items like \"냄비\" and \"프라이팬\", jobs like \"의사\" and \"요리사\", body parts like \"눈썹\" and \"이마\", and daily items like \"에어컨\" and \"충전기\".",
+      "active": false,
+      "title": "Daily · 10 questions",
+      "message": "",
       "date": "2026-06-20",
       "button": "OK"
     },
     {
       "id": "2026-06-all-stages",
       "revision": 1,
-      "active": true,
-      "title": "All Levels Expanded",
-      "message": "2 new stages added to every level. Beginner now has 23 stages (230 words), Intermediate 17 stages (170 words), Advanced 15 stages (150 proverbs), and Expert 16 stages (160 homophones). Learn animals like \"펭귄\" and \"호랑이\", personality words like \"정중하다\" and \"세련되다\", proverbs like \"계란으로 바위치기\", and homophones like \"녹\" (green / record / melt) and \"물\" (water / goods / opportunity).",
+      "active": false,
+      "title": "All levels · +20 words each",
+      "message": "",
       "date": "2026-06-19",
       "button": "OK"
     },
     {
       "id": "2026-06-expert-stages",
       "revision": 2,
-      "active": true,
-      "title": "Expert Stages Expanded",
-      "message": "4 new Expert stages added. Expert now has 14 stages with 140 Korean homophones (10 questions each). Practice tricky words like \"맞다\" (correct / hit / fit), \"역\" (station / reverse / role), and \"금\" (gold / forbidden / crack).",
+      "active": false,
+      "title": "Expert · +40 words",
+      "message": "",
       "date": "2026-06-18",
       "button": "OK"
     },
     {
       "id": "2026-06-advanced-stages",
       "revision": 2,
-      "active": true,
-      "title": "Advanced Stages Expanded",
-      "message": "4 new Advanced stages added. Advanced now has 13 stages with 130 Korean proverbs (10 questions each). Practice idioms like \"꿩 먹고 알 먹고\", \"방 안에 떡\", and \"말이 씨가 된다\".",
+      "active": false,
+      "title": "Advanced · +40 proverbs",
+      "message": "",
       "date": "2026-06-17",
       "button": "OK"
     },
     {
       "id": "2026-06-intermediate-stages",
       "revision": 2,
-      "active": true,
-      "title": "Intermediate Stages Expanded",
-      "message": "4 new Intermediate stages added. Intermediate now has 15 stages with 150 adjectives and emotions (10 questions each). Practice words like \"매콤하다\", \"겸손하다\", and \"애매하다\".",
+      "active": false,
+      "title": "Intermediate · +40 words",
+      "message": "",
       "date": "2026-06-16",
       "button": "OK"
     },
     {
       "id": "2026-06-beginner-stages",
       "revision": 3,
-      "active": true,
-      "title": "Beginner Stages Expanded",
-      "message": "4 new Beginner stages added. Beginner now has 21 stages with 210 words (10 questions each). Learn animals, food, school supplies, and body parts like \"코끼리\", \"당근\", \"지우개\", and \"손가락\".",
+      "active": false,
+      "title": "Beginner · +40 words",
+      "message": "",
       "date": "2026-06-15",
-      "button": "OK"
-    },
-    {
-      "id": "2026-06-expert-stages",
-      "revision": 1,
-      "active": false,
-      "title": "Expert Stages Expanded",
-      "message": "4 new Expert stages added. Expert now has 10 stages with 100 Korean homophones (10 questions each). Practice tricky words like \"산\" (mountain / acid / coral), \"화\" (fire / flower / speech / anger), and \"사\" (four / death / affair / company).",
-      "date": "2026-06-15",
-      "button": "OK"
-    },
-    {
-      "id": "2026-06-intermediate-stages",
-      "revision": 1,
-      "active": false,
-      "title": "Intermediate Stages Expanded",
-      "message": "4 new Intermediate stages added. Intermediate now has 11 stages with 110 adjectives and emotions (10 questions each). Practice words like \"차분하다\", \"뿌듯하다\", and \"믿음직하다\".",
-      "date": "2026-06-11",
-      "button": "OK"
-    },
-    {
-      "id": "2026-06-advanced-stages",
-      "revision": 1,
-      "active": false,
-      "title": "Advanced Stages Expanded",
-      "message": "2 new Advanced stages added. Advanced now has 9 stages with 90 Korean proverbs (10 questions each). Practice everyday idioms like \"누워서 침 먹기\" and \"백문이 불여일견\".",
-      "date": "2026-06-09",
-      "button": "OK"
-    },
-    {
-      "id": "2026-06-beginner-stages",
-      "revision": 2,
-      "active": false,
-      "title": "Beginner Stages Expanded",
-      "message": "4 more Beginner stages added. Beginner now has 17 stages with 170 words (10 questions each). Also fixed minor typo issues.",
-      "date": "2026-06-09",
       "button": "OK"
     },
     {
       "id": "2026-06-stages-update",
       "revision": 1,
-      "active": true,
-      "title": "New Stages Added",
-      "message": "2 new stages in every level: Beginner 9, Intermediate 7, Advanced 7, and Expert 6 stages (10 questions each). 80 new words and proverbs in total.",
+      "active": false,
+      "title": "All levels · +20 words each",
+      "message": "",
       "date": "2026-06-04",
       "button": "OK"
     },
     {
       "id": "2026-06-app-improvements",
       "revision": 1,
-      "active": true,
-      "title": "App Improvements",
-      "message": "Web content now updates automatically without clearing cache. The back button exits the app from Home, and goes back inside quizzes and settings.",
+      "active": false,
+      "title": "App · auto web updates",
+      "message": "",
       "date": "2026-06-04",
       "button": "OK"
     },
     {
       "id": "2026-06-daily",
       "revision": 1,
-      "active": true,
-      "title": "New Daily 3",
-      "message": "Start a quick 3-question session and keep your streak alive.",
+      "active": false,
+      "title": "Daily · 3 questions",
+      "message": "",
       "date": "2026-06-03",
       "button": "OK"
     },
     {
       "id": "2026-06-retention",
-      "revision": 1,
+      "revision": 2,
       "active": true,
-      "title": "Review Mode Added",
-      "message": "Wrong answers are now saved automatically so you can review them later.",
+      "title": "Wrong answers saved automatically",
+      "message": "",
       "date": "2026-06-02",
       "button": "OK"
     }

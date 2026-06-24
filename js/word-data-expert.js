@@ -1,7 +1,7 @@
 // Quiz type: Korean homophone + one meaning's emoji & example displayed
 //   → choose the correct English meaning (4-choice)
 // After answering, ALL meanings for that word are revealed.
-const WordData = {
+var WordData = {
   expert: [
     {
       korean: '눈',

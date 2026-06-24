@@ -104,7 +104,7 @@
       line-height: 1.5;
     }
   </style>
-  <script src="./js/app.js?v=20260603-5"></script>
+  <script src="./js/app.js?v=20260624-8"></script>
 </head>
 <body>
   <div class="top-bar">
@@ -119,7 +119,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260603-5';
+      new URLSearchParams(window.location.search).get('v') || '20260624-8';
     const CURRENT_PACKAGE_ID = 'com.kysystemstudio.hangulchallenge';
 
     const backUrl = new URL('index.html', location.href);
@@ -150,8 +150,7 @@
 
     async function loadMoreAppsPage() {
       try {
-        const res = await fetch('./more-apps.json?v=' + encodeURIComponent(WEB_VERSION));
-        const data = await res.json();
+        const data = await fetchBundledJson('more-apps.json', WEB_VERSION);
         const studioName = data.studioName || "GGOOK's Studio";
         document.getElementById('pageTitle').textContent = studioName;
         document.getElementById('pageIntro').textContent =

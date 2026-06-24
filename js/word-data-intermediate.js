@@ -1,6 +1,6 @@
 // Quiz type: Korean adjective/emotion displayed → choose English meaning (Type A only)
 // After correct answer the 'example' sentence is shown as feedback.
-const WordData = {
+var WordData = {
   intermediate: [
     { korean: '예쁘다', english: 'Pretty / Beautiful', example: '꽃이 예쁘다 (The flower is pretty)' },
     { korean: '맛있다', english: 'Delicious / Tasty', example: '음식이 맛있다 (The food is delicious)' },

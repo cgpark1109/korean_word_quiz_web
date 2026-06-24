@@ -4,24 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Notice – Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260528-1">
+  <link rel="stylesheet" href="./css/base.css?v=20260624-9">
   <style>
+    body.notice-page {
+      padding-bottom: 8px;
+    }
     .top-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 16px 20px 8px;
+      gap: 8px;
+      padding: 10px 16px 6px;
     }
     .back-btn {
       background: none;
       border: none;
-      font-size: 22px;
+      font-size: 20px;
       color: var(--text-secondary);
       cursor: pointer;
-      padding: 4px;
+      padding: 2px;
+      text-decoration: none;
+      line-height: 1;
     }
     .page-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--text-primary);
       flex: 1;
@@ -29,42 +34,43 @@
     .notice-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding: 8px 20px 24px;
+      gap: 8px;
+      padding: 0 16px 12px;
     }
     .notice-item {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       background: var(--card-bg);
-      padding: 14px 14px 12px;
+      padding: 10px 12px;
     }
     .notice-title {
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 4px;
+      line-height: 1.35;
+      flex: 1;
+      min-width: 0;
     }
     .notice-date {
       font-size: 11px;
       color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-    .notice-message {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      white-space: pre-line;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
     .empty-text {
-      margin: 20px;
+      margin: 8px 16px 12px;
       text-align: center;
       color: var(--text-muted);
       font-size: 13px;
     }
   </style>
-  <script src="./js/app.js?v=20260528-1"></script>
+  <script src="./js/app.js?v=20260624-9"></script>
 </head>
-<body>
+<body class="notice-page">
   <div class="top-bar">
     <a class="back-btn" id="backBtn" href="index.html">←</a>
     <div class="page-title">Notices</div>
@@ -75,7 +81,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260528-1';
+      new URLSearchParams(window.location.search).get('v') || '20260624-9';
 
     const backUrl = new URL('index.html', location.href);
     backUrl.searchParams.set('v', WEB_VERSION);
@@ -85,17 +91,15 @@
       const el = document.createElement('article');
       el.className = 'notice-item';
       el.innerHTML = `
-        <div class="notice-title">${item.title || 'Notice'}</div>
+        <div class="notice-title">${formatNoticeSummary(item)}</div>
         <div class="notice-date">${item.date || '-'}</div>
-        <div class="notice-message">${item.message || ''}</div>
       `;
       return el;
     }
 
     async function loadNoticePage() {
       try {
-        const res = await fetch('./notice.json?v=' + encodeURIComponent(WEB_VERSION));
-        const data = await res.json();
+        const data = await fetchBundledJson('notice.json', WEB_VERSION);
         const list = document.getElementById('noticeList');
 
         const notices = getActiveNotices(data).sort((a, b) => {
@@ -105,27 +109,7 @@
         });
 
         if (!notices.length) {
-          const fallback = [];
-          if (data.popup?.active) {
-            fallback.push({
-              title: data.popup.title || 'Popup Notice',
-              message: data.popup.message || '',
-              date: getLocalDateKey(),
-            });
-          }
-          if (data.banner?.active) {
-            fallback.push({
-              title: 'Banner Notice',
-              message: data.banner.message || '',
-              date: getLocalDateKey(),
-            });
-          }
-
-          if (!fallback.length) {
-            document.getElementById('emptyText').style.display = 'block';
-            return;
-          }
-          fallback.forEach(item => list.appendChild(renderNoticeItem(item)));
+          document.getElementById('emptyText').style.display = 'block';
           return;
         }
 

@@ -139,35 +139,39 @@
       font-size: 18px;
       color: var(--text-muted);
     }
+    .level-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 0 20px 14px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .level-tab {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .level-tab.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+    }
   </style>
-  <script src="./js/app.js?v=20260603-5"></script>
-  <script>
-    (function () {
-      const params = new URLSearchParams(location.search);
-      if (params.get('level')) {
-        sessionStorage.removeItem('force_daily_quiz');
-        return;
-      }
-      if (sessionStorage.getItem('force_daily_quiz') !== '1') return;
-      sessionStorage.removeItem('force_daily_quiz');
-      const level = resolveStageLevel();
-      const version = params.get('v') || '20260603-5';
-      const target = new URL('quiz.html', location.href);
-      target.searchParams.set('level', level);
-      target.searchParams.set('mode', 'daily');
-      target.searchParams.set('daily', '1');
-      target.searchParams.set('count', String(DAILY_QUESTION_COUNT));
-      target.searchParams.set('source', 'home');
-      target.searchParams.set('v', version);
-      location.replace(target.toString());
-    })();
-  </script>
+  <script src="./js/app.js?v=20260624-6"></script>
 </head>
 <body>
   <div class="top-bar">
     <a class="back-btn" id="backBtn" href="index.html">←</a>
     <div class="page-title" id="pageTitle">Stages</div>
   </div>
+  <div class="level-tabs" id="levelTabs"></div>
   <p class="stage-hint" id="stageHint">Each stage has 10 questions.</p>
   <div class="retention-panel">
     <div class="retention-meta" id="streakMeta">Current streak: 0 days</div>
@@ -183,7 +187,7 @@
 
   <script>
     const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260603-5';
+      new URLSearchParams(window.location.search).get('v') || '20260624-6';
     const QUESTIONS_PER_STAGE = 10;
     const level = resolveStageLevel();
     const wordCounts = {
@@ -213,6 +217,18 @@
     document.getElementById('stageHint').textContent =
       `${totalStages} stages · 10 questions each · ${totalWords} words total`;
 
+    const levelTabs = document.getElementById('levelTabs');
+    if (levelTabs) {
+      STAGE_LEVELS.forEach(tabLevel => {
+        const tab = document.createElement('a');
+        tab.className = 'level-tab' + (tabLevel === level ? ' active' : '');
+        tab.textContent = LEVEL_DISPLAY_NAMES[tabLevel] || tabLevel;
+        tab.href = buildStagesUrl(tabLevel, WEB_VERSION);
+        tab.addEventListener('click', () => rememberStageLevel(tabLevel));
+        levelTabs.appendChild(tab);
+      });
+    }
+
     function formatDayCount(count) {
       return `${count} ${count === 1 ? 'day' : 'days'}`;
     }
@@ -220,8 +236,8 @@
     const streak = getPlayStreak();
     document.getElementById('streakMeta').textContent =
       streak.current > 0
-        ? `Current streak ${formatDayCount(streak.current)} · Best ${formatDayCount(streak.best)}`
-        : 'Use Daily 10 from Home to start your streak';
+        ? `Play streak ${formatDayCount(streak.current)} · Best ${formatDayCount(streak.best)}`
+        : 'Complete a stage to start your streak';
 
     const backUrl = new URL('index.html', location.href);
     backUrl.searchParams.set('v', WEB_VERSION);
@@ -288,6 +304,7 @@
 
       if (unlocked) {
         btn.addEventListener('click', () => {
+          rememberStageLevel(level);
           const url = new URL('quiz.html', location.href);
           url.searchParams.set('level', level);
           url.searchParams.set('stage', String(n));

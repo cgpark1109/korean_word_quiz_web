@@ -4,8 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Quiz – Korean Word Quiz</title>
-  <link rel="stylesheet" href="./css/base.css?v=20260603-2">
+  <link rel="stylesheet" href="./css/base.css?v=20260624-5" />
   <style>
+    :root {
+      --bg: #f5f0e8;
+      --card-bg: #ede5d5;
+      --border: #c9b99a;
+      --gold: #8b6914;
+      --text-primary: #3d2b1a;
+      --text-secondary: #6b4f2a;
+      --text-muted: #9b8b7a;
+      --correct-bg: #eaf0e0;
+      --correct-text: #5c7a3e;
+      --wrong-bg: #f5e0e0;
+      --wrong-text: #8b2020;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
     body.quiz-page {
       display: flex;
       flex-direction: column;
@@ -89,6 +104,18 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
+    }
+    .question-level-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
     }
     .question-type-label {
       font-size: 12px;
@@ -269,7 +296,7 @@
       }
     }
   </style>
-  <script src="./js/app.js?v=20260624-1"></script>
+  <script src="./js/app.js?v=20260624-9"></script>
 </head>
 <body class="quiz-page">
   <header class="quiz-header">
@@ -289,6 +316,7 @@
   <main class="quiz-main">
     <div class="quiz-center">
       <div class="card question-card">
+        <div class="question-level-tag" id="questionLevelTag"></div>
         <div class="question-type-label" id="questionTypeLabel"></div>
         <div class="question-word" id="questionWord"></div>
         <div class="question-hint" id="questionSubHint"></div>
@@ -317,48 +345,42 @@
   </main>
 
   <script>
-    const WEB_VERSION =
-      new URLSearchParams(window.location.search).get('v') || '20260603-5';
+    (function bootQuizPage() {
+      const WEB_VERSION =
+        new URLSearchParams(window.location.search).get('v') || '20260624-9';
+
+      function showQuizError(message) {
+        const grid = document.getElementById('choicesGrid');
+        if (grid) grid.style.display = 'none';
+        const typeLabel = document.getElementById('questionTypeLabel');
+        const wordEl = document.getElementById('questionWord');
+        const subHint = document.getElementById('questionSubHint');
+        if (typeLabel) typeLabel.textContent = 'Failed to load quiz';
+        if (wordEl) {
+          wordEl.textContent = message;
+          wordEl.className = 'question-word small';
+        }
+        if (subHint) subHint.textContent = '';
+        const fb = document.getElementById('feedbackBox');
+        const title = document.getElementById('feedbackTitle');
+        const hint = document.getElementById('feedbackHint');
+        const nextWrap = document.getElementById('nextBtnWrap');
+        if (fb) fb.className = 'feedback-box wrong show';
+        if (title) title.textContent = 'Error';
+        if (hint) hint.textContent = 'Word data is empty or failed to load.';
+        if (nextWrap) nextWrap.className = 'next-btn-wrap';
+      }
+
+      if (typeof resolveStageLevel !== 'function') {
+        showQuizError('App script failed to load.');
+        return;
+      }
+
     const urlParams = new URLSearchParams(location.search);
-    const requestedLevel = urlParams.get('level') || resolveStageLevel();
-    const requestedMode = (urlParams.get('mode') || 'stage').toLowerCase();
-    const dailyFlag = urlParams.get('daily') === '1';
-    const source = urlParams.get('source') || '';
-    const countParam = urlParams.get('count') || '';
-    const forceDailyFlag = sessionStorage.getItem('force_daily_quiz') === '1';
-    let mode = requestedMode;
-    if (
-      forceDailyFlag ||
-      dailyFlag ||
-      requestedMode === 'daily' ||
-      (source === 'home' && countParam === String(DAILY_QUESTION_COUNT) && !urlParams.has('stage')) ||
-      (countParam === String(DAILY_QUESTION_COUNT) && !urlParams.has('stage')) ||
-      (countParam === '3' && !urlParams.has('stage'))
-    ) {
-      mode = 'daily';
-      sessionStorage.removeItem('force_daily_quiz');
-    }
-    const requestedCount = parseInt(urlParams.get('count') || '0', 10);
-    const level = normalizeStageLevel(requestedLevel) || 'beginner';
-    if (mode !== 'daily') {
-      rememberStageLevel(level);
-    }
-    const QUESTIONS_PER_STAGE = 10;
-    const wordCounts = {
-      beginner: 300,
-      intermediate: 300,
-      advanced: 300,
-      expert: 300,
-    };
-    const totalStages = Math.ceil((wordCounts[level] || 30) / QUESTIONS_PER_STAGE);
-    let stage = parseInt(urlParams.get('stage') || '1', 10);
-    if (!Number.isFinite(stage) || stage < 1) stage = 1;
-    if (stage > totalStages) stage = totalStages;
-    let TOTAL = QUESTIONS_PER_STAGE;
-    if (mode === 'daily') TOTAL = DAILY_QUESTION_COUNT;
-    else if (mode === 'review' && Number.isFinite(requestedCount) && requestedCount > 0) {
-      TOTAL = Math.min(10, requestedCount);
-    }
+    const mode = (urlParams.get('mode') || 'random').toLowerCase();
+    const level = resolveStageLevel();
+    const QUESTIONS_PER_QUIZ = 10;
+    let TOTAL = QUESTIONS_PER_QUIZ;
     document.getElementById('progressText').textContent = `1 / ${TOTAL}`;
 
     const levelIcons = {
@@ -374,104 +396,42 @@
       expert: 'Expert',
     };
 
-    const backTarget = mode === 'daily' ? 'index.html' : 'stages.html';
-    const backUrl = new URL(backTarget, location.href);
-    if (mode !== 'daily') {
-      backUrl.searchParams.set('level', level);
-    }
+    const backUrl = new URL('index.html', location.href);
     backUrl.searchParams.set('v', WEB_VERSION);
     document.getElementById('backBtn').href = backUrl.toString();
-    const modeLabel =
-      mode === 'review' ? 'Review' : mode === 'daily' ? `Daily ${DAILY_QUESTION_COUNT}` : `Stage ${stage}`;
-    document.getElementById('levelBadge').textContent =
-      `${levelIcons[level] || ''} ${levelNames[level] || level} · ${modeLabel}`.trim();
+    document.getElementById('levelBadge').textContent = 'All Levels';
 
-    function showQuizError(message) {
-      document.getElementById('choicesGrid').style.display = 'none';
-      document.getElementById('questionTypeLabel').textContent =
-        'Failed to load quiz';
-      document.getElementById('questionWord').textContent = message;
-      document.getElementById('questionWord').className = 'question-word small';
-      document.getElementById('questionSubHint').textContent = '';
-      document.getElementById('feedbackBox').className = 'feedback-box wrong show';
-      document.getElementById('feedbackTitle').textContent = 'Error';
-      document.getElementById('feedbackHint').textContent =
-        'Word data is empty or failed to load.';
-      document.getElementById('nextBtnWrap').className = 'next-btn-wrap';
+    loadAllWordPools(WEB_VERSION)
+      .then(poolsByLevel => {
+        try {
+          initQuiz(poolsByLevel);
+        } catch (e) {
+          showQuizError(e && e.message ? e.message : String(e));
+        }
+      })
+      .catch(() => showQuizError('Failed to load word data.'));
+
+    function setQuestionLevelTag(wordLevel) {
+      const el = document.getElementById('questionLevelTag');
+      if (!el) return;
+      const label = levelNames[wordLevel] || wordLevel;
+      el.textContent = `${levelIcons[wordLevel] || ''} ${label}`.trim();
     }
 
-    const script = document.createElement('script');
-    script.src = `js/word-data-${level}.js?v=${encodeURIComponent(WEB_VERSION)}`;
-    script.onload = () => initQuiz();
-    script.onerror = () => showQuizError('Failed to load level data file.');
-    document.head.appendChild(script);
+    function initQuiz(poolsByLevel) {
+      const fullPool = [];
+      STAGE_LEVELS.forEach(lv => {
+        (poolsByLevel[lv] || []).forEach(word => {
+          fullPool.push({ ...word, _level: lv });
+        });
+      });
 
-    function initQuiz() {
-      const wordData = typeof WordData !== 'undefined' ? WordData : {};
-      const pool = [...(wordData[level] || [])];
-
-      if (!pool.length) {
-        showQuizError('No data found for this level.');
+      if (!fullPool.length) {
+        showQuizError('No word data found.');
         return;
       }
 
-      function getWordId(word) {
-        if (!word || typeof word !== 'object') return '';
-        if (word.korean && word.english) return `${word.korean}__${word.english}`;
-        if (word.korean && word.answer) return `${word.korean}__${word.answer}`;
-        if (word.korean && Array.isArray(word.meanings)) return `${word.korean}__expert`;
-        return JSON.stringify(word);
-      }
-
-      function getDailyWords() {
-        return [...pool];
-      }
-
-      function getDailyFixedWords() {
-        const dailyPool = getDailyWords();
-        const maxDailyCount = Math.min(TOTAL, dailyPool.length);
-        if (!maxDailyCount) return [];
-
-        const todayKey = getLocalDateKey();
-        const storageKey = `daily_word_ids_${level}_${todayKey}`;
-        const savedIds = getJsonStorage(storageKey, []);
-        const byId = new Map(dailyPool.map(word => [getWordId(word), word]));
-
-        if (Array.isArray(savedIds) && savedIds.length) {
-          const savedWords = savedIds
-            .map(id => byId.get(id))
-            .filter(Boolean)
-            .slice(0, maxDailyCount);
-          if (savedWords.length === maxDailyCount) return savedWords;
-        }
-
-        const selectedWords = shuffle([...dailyPool]).slice(0, maxDailyCount);
-        setJsonStorage(storageKey, selectedWords.map(getWordId));
-        return selectedWords;
-      }
-
-      let sourceWords = [];
-      if (mode === 'review') {
-        const reviewSet = new Set(getReviewWordIds(level));
-        sourceWords = pool.filter(w => reviewSet.has(getWordId(w)));
-      } else if (mode === 'daily') {
-        sourceWords = getDailyFixedWords();
-      } else {
-        const startIdx = (stage - 1) * QUESTIONS_PER_STAGE;
-        sourceWords = pool.slice(startIdx, startIdx + QUESTIONS_PER_STAGE);
-      }
-
-      if (!sourceWords.length) {
-        if (mode === 'review') {
-          showQuizError('No review items found.');
-        } else {
-          showQuizError('Not enough questions to start this mode.');
-        }
-        return;
-      }
-
-      const preparedWords = mode === 'daily' ? [...sourceWords] : shuffle([...sourceWords]);
-      const questions = preparedWords.slice(0, Math.min(TOTAL, sourceWords.length));
+      const questions = sourceWords;
       TOTAL = questions.length;
       if (!TOTAL) {
         showQuizError('Failed to load questions.');
@@ -486,7 +446,9 @@
       let correctCount = 0;
       let streak = 0;
 
-      const quizDir = supportsQuizDirection(level) ? getQuizDirection(level) : 'KO_EN';
+      function getWordLevel(word) {
+        return word?._level || level;
+      }
 
       let hintUnlockedForQuestion = false;
       let hintRewardInFlight = false;
@@ -613,13 +575,17 @@
       }
 
       function markWrongWord(word) {
-        addReviewWord(level, getWordId(word));
+        const wordLevel = getWordLevel(word);
+        const wordId = getWordId(word);
+        addReviewWord(wordLevel, wordId);
+        removeLearnedWord(wordLevel, wordId);
       }
 
       function markCorrectWord(word) {
-        if (mode === 'review') {
-          removeReviewWord(level, getWordId(word));
-        }
+        const wordLevel = getWordLevel(word);
+        const wordId = getWordId(word);
+        addLearnedWord(wordLevel, wordId);
+        removeReviewWord(wordLevel, wordId);
       }
 
       function applyStreak() {
@@ -642,31 +608,38 @@
           return;
         }
 
-        if (level === 'advanced') {
-          renderAdvanced(q);
+        const wordLevel = getWordLevel(q);
+        setQuestionLevelTag(wordLevel);
+
+        if (wordLevel === 'advanced') {
+          renderAdvanced(q, wordLevel);
           setupHintRewardUI(q, 'advanced');
-        } else if (level === 'expert') {
-          renderExpert(q);
+        } else if (wordLevel === 'expert') {
+          renderExpert(q, wordLevel);
           setupHintRewardUI(q, 'expert');
         } else {
           hideHintRewardUI();
-          renderMCQ(q);
+          renderMCQ(q, wordLevel);
         }
       }
 
-      function renderMCQ(q) {
+      function renderMCQ(q, wordLevel) {
         document.getElementById('choicesGrid').style.display = '';
+        const quizDir = supportsQuizDirection(wordLevel)
+          ? getQuizDirection(wordLevel)
+          : 'KO_EN';
+        const levelPool = poolsByLevel[wordLevel] || [];
 
         if (quizDir === 'KO_EN') {
           document.getElementById('questionTypeLabel').textContent = 'What is the English meaning?';
           document.getElementById('questionWord').textContent = q.korean;
           document.getElementById('questionWord').className = 'question-word';
-          buildChoices(q, 'english', pool);
+          buildChoices(q, 'english', levelPool);
         } else {
           document.getElementById('questionTypeLabel').textContent = 'What is the Korean word?';
           document.getElementById('questionWord').textContent = q.english;
           document.getElementById('questionWord').className = 'question-word';
-          buildChoices(q, 'korean', pool);
+          buildChoices(q, 'korean', levelPool);
         }
       }
 
@@ -722,15 +695,16 @@
         showNextBtn();
       }
 
-      function renderAdvanced(q) {
+      function renderAdvanced(q, wordLevel) {
         document.getElementById('choicesGrid').style.display = '';
         document.getElementById('questionTypeLabel').textContent = 'Which word best fits the blank?';
         document.getElementById('questionWord').textContent = q.korean;
         document.getElementById('questionWord').className = 'question-word small';
         document.getElementById('questionSubHint').textContent = q.english;
 
+        const levelPool = poolsByLevel[wordLevel] || [];
         const others = shuffle(
-          pool.filter(w => w.answer !== q.answer).map(w => w.answer)
+          levelPool.filter(w => w.answer !== q.answer).map(w => w.answer)
         ).slice(0, 3);
         const options = shuffle([q.answer, ...others]);
 
@@ -776,21 +750,20 @@
         showNextBtn();
       }
 
-      function renderExpert(q) {
+      function renderExpert(q, wordLevel) {
         document.getElementById('choicesGrid').style.display = '';
         document.getElementById('questionTypeLabel').textContent = 'What does this mean?';
         document.getElementById('questionWord').textContent = q.korean;
         document.getElementById('questionWord').className = 'question-word';
 
-        // Pick one random meaning to quiz on
         const targetIdx = Math.floor(Math.random() * q.meanings.length);
         const target = q.meanings[targetIdx];
 
         document.getElementById('questionSubHint').innerHTML =
           `${target.emoji}&nbsp;&nbsp;<em>${target.example}</em>`;
 
-        // Collect wrong options from all other meanings in the pool
-        const allEnglish = pool.flatMap(w => w.meanings.map(m => m.english));
+        const levelPool = poolsByLevel[wordLevel] || [];
+        const allEnglish = levelPool.flatMap(w => w.meanings.map(m => m.english));
         const others = shuffle(
           allEnglish.filter(e => e !== target.english)
         ).slice(0, 3);
@@ -845,23 +818,17 @@
       }
 
       document.getElementById('nextBtn').addEventListener('click', () => {
-        if (mode === 'daily') {
-          setDailyAnsweredCount(level, current + 1);
-        }
         current++;
         if (current >= TOTAL) {
-          const query = new URLSearchParams({
-            level,
-            stage: String(stage),
-            mode,
+          const queryParams = {
+            mode: 'random',
             score: String(score),
             correct: String(correctCount),
             totalQuestions: String(TOTAL),
             streakCurrent: String(streakSummary.current),
-            totalStages: String(totalStages),
             v: WEB_VERSION,
-          }).toString();
-          location.href = `result.html?${query}`;
+          };
+          location.href = `result.html?${new URLSearchParams(queryParams).toString()}`;
         } else {
           renderQuestion();
         }
@@ -869,6 +836,7 @@
 
       renderQuestion();
     }
+    })();
   </script>
 </body>
 </html>
