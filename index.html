@@ -436,7 +436,7 @@
         }
       }
     </style>
-    <script src="./js/app.js?v=20260624-3"></script>
+    <script src="./js/app.js?v=20260624-4"></script>
   </head>
   <body class="home-page">
     <div class="header">
@@ -485,7 +485,7 @@
         <button class="home-btn" type="button" id="heroBtn">Start Learning</button>
       </div>
 
-      <div class="home-card mission-card">
+      <div class="home-card mission-card" id="dailyChallengeCard">
         <div class="mission-title">Daily Challenge</div>
         <div class="mission-meta" id="dailyChallengeMeta">
           Complete 10 questions to keep your streak going.
@@ -556,7 +556,7 @@
 
     <script>
       const WEB_VERSION =
-        new URLSearchParams(window.location.search).get("v") || "20260624-3";
+        new URLSearchParams(window.location.search).get("v") || "20260624-4";
 
       function updateDailyProgressBar(answered, total, completed) {
         const fill = document.getElementById("dailyProgressFill");
@@ -572,7 +572,7 @@
           trackEvent("first_open");
         }
 
-        const dailyChallengeMeta = document.getElementById("dailyChallengeMeta");
+        const dailyChallengeCard = document.getElementById("dailyChallengeCard");
         const dailyChallengeProgress = document.getElementById("dailyChallengeProgress");
         const dailyChallengeBtn = document.getElementById("dailyChallengeBtn");
         const heroTitle = document.getElementById("heroTitle");
@@ -598,7 +598,16 @@
         }
 
         function renderDailyChallenge() {
+          if (typeof hasPlayHistory === "function" && !hasPlayHistory()) {
+            if (dailyChallengeCard) dailyChallengeCard.style.display = "none";
+            return;
+          }
+          if (dailyChallengeCard) dailyChallengeCard.style.display = "";
+
           if (typeof getDailyChallengeStatus !== "function") return;
+          const dailyChallengeMeta = document.getElementById("dailyChallengeMeta");
+          const dailyChallengeProgress = document.getElementById("dailyChallengeProgress");
+          const dailyChallengeBtn = document.getElementById("dailyChallengeBtn");
           const preferredLevel =
             localStorage.getItem("home_daily_level") || "beginner";
           const status = getDailyChallengeStatus(preferredLevel);
