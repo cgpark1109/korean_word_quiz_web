@@ -69,6 +69,10 @@
       line-height: 1.3;
       margin-bottom: 2px;
     }
+    .word-answer {
+      font-weight: 700;
+      color: var(--gold);
+    }
     .word-secondary {
       font-size: 13px;
       color: var(--text-secondary);
@@ -86,7 +90,7 @@
       background: var(--card-bg);
     }
   </style>
-  <script src="./js/app.js?v=20260624-9"></script>
+  <script src="./js/app.js?v=20260624-11"></script>
 </head>
 <body class="words-page">
   <div class="top-bar">
@@ -123,16 +127,42 @@
         ? 'Correct answers — view only'
         : 'Missed words — view only';
 
+    function renderPrimaryLine(container, summary) {
+      const parts = summary.primaryParts;
+      if (parts?.emphasize) {
+        container.append(document.createTextNode(parts.before));
+        const answerEl = document.createElement('strong');
+        answerEl.className = 'word-answer';
+        answerEl.textContent = parts.answer;
+        container.appendChild(answerEl);
+        container.append(document.createTextNode(parts.after));
+        return;
+      }
+      container.textContent = summary.primary;
+    }
+
     function renderWordItem(entry, word) {
       const el = document.createElement('article');
       el.className = 'word-item';
-      const summary = formatWordSummary(word, entry.level);
+      const summary = formatWordSummary(word, entry.level, {
+        emphasizeAnswer: listType === 'wrong',
+      });
       const levelLabel = LEVEL_DISPLAY_NAMES[entry.level] || entry.level;
-      el.innerHTML = `
-        <div class="word-level">${LEVEL_ICONS[entry.level] || ''} ${levelLabel}</div>
-        <div class="word-primary">${summary.primary}</div>
-        <div class="word-secondary">${summary.secondary}</div>
-      `;
+
+      const levelEl = document.createElement('div');
+      levelEl.className = 'word-level';
+      levelEl.textContent =
+        `${LEVEL_ICONS[entry.level] || ''} ${levelLabel}`.trim();
+
+      const primaryEl = document.createElement('div');
+      primaryEl.className = 'word-primary';
+      renderPrimaryLine(primaryEl, summary);
+
+      const secondaryEl = document.createElement('div');
+      secondaryEl.className = 'word-secondary';
+      secondaryEl.textContent = summary.secondary;
+
+      el.append(levelEl, primaryEl, secondaryEl);
       return el;
     }
 
